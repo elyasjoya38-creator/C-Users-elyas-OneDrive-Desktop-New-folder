@@ -1,0 +1,476 @@
+{% extends 'enroll/index.html' %}
+{% block contents %}
+<style>
+    .manage-pdc-wrap {
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 25px 15px;
+    }
+
+    .manage-pdc-heading {
+        background: linear-gradient(120deg, #1565c0, #42a5f5);
+        color: #fff;
+        padding: 26px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 24px rgba(21, 101, 192, .16);
+    }
+
+    .manage-pdc-heading h2 {
+        margin: 0 0 8px;
+        font-size: 27px;
+    }
+
+    .manage-pdc-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .manage-pdc-stat,
+    .manage-pdc-panel {
+        background: #fff;
+        border: 1px solid #e8edf5;
+        border-radius: 13px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(30, 55, 90, .05);
+    }
+
+    .manage-pdc-stat span {
+        display: block;
+        color: #718096;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .manage-pdc-stat strong {
+        color: #1e293b;
+        font-size: 22px;
+        overflow-wrap: anywhere;
+    }
+
+    .manage-pdc-panel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .manage-pdc-panel-head h3 {
+        margin: 0;
+        color: #1e293b;
+        font-size: 21px;
+    }
+
+    .manage-pdc-count {
+        color: #1565c0;
+        background: #e8f2ff;
+        padding: 7px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .manage-pdc-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #e8edf5;
+        border-radius: 9px;
+    }
+
+    .manage-pdc-table {
+        width: 100%;
+        min-width: 1050px;
+        border-collapse: collapse;
+        background: #fff;
+    }
+
+    .manage-pdc-table th,
+    .manage-pdc-table td {
+        text-align: left;
+        padding: 13px 11px;
+        border-bottom: 1px solid #edf1f7;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .manage-pdc-table th {
+        background: #edf4fc;
+        color: #475569;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+        white-space: nowrap;
+    }
+
+    .manage-pdc-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .manage-pdc-table tbody tr:hover {
+        background: #f7faff;
+    }
+
+    .manage-pdc-table a {
+        color: #1565c0;
+        text-decoration: none;
+    }
+
+    .manage-pdc-table a:hover {
+        text-decoration: underline;
+    }
+
+    .manage-pdc-actions {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+    }
+
+    .manage-pdc-actions form {
+        margin: 0;
+    }
+
+    .manage-pdc-btn {
+        display: inline-block;
+        padding: 8px 11px;
+        border: 0;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none !important;
+        cursor: pointer;
+    }
+
+    .manage-pdc-btn-add,
+    .manage-pdc-btn-edit {
+        background: #e4efff;
+        color: #1565c0 !important;
+    }
+
+    .manage-pdc-btn-add {
+        background: #1565c0;
+        color: #fff !important;
+    }
+
+    .manage-pdc-btn-delete {
+        background: #ffe8e8;
+        color: #dc2626;
+    }
+
+    .manage-pdc-btn-delete:hover {
+        background: #dc2626;
+        color: #fff;
+    }
+
+    .manage-pdc-empty {
+        padding: 30px !important;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .manage-pdc-alert {
+        position: relative;
+        padding: 12px 42px 12px 14px;
+        border-radius: 8px;
+        background: #e8f8ee;
+        color: #166534;
+        margin-bottom: 10px;
+    }
+
+    .manage-pdc-alert.error,
+    .manage-pdc-alert.danger {
+        background: #fde8e8;
+        color: #991b1b;
+    }
+
+    .manage-pdc-alert.warning {
+        background: #fff7db;
+        color: #92400e;
+    }
+
+    .manage-pdc-alert-close {
+        position: absolute;
+        right: 10px;
+        top: 5px;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        font-size: 22px;
+        cursor: pointer;
+    }
+
+    .manage-pdc-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background: rgba(15, 23, 42, .62);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .manage-pdc-modal.is-open {
+        display: flex;
+    }
+
+    .manage-pdc-modal-box {
+        width: 100%;
+        max-width: 430px;
+        padding: 26px;
+        border-radius: 15px;
+        background: #fff;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
+        text-align: center;
+    }
+
+    .manage-pdc-modal-box h3 {
+        margin: 0 0 12px;
+        color: #1e293b;
+    }
+
+    .manage-pdc-modal-box p {
+        color: #64748b;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+    }
+
+    .manage-pdc-modal-actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 22px;
+    }
+
+    .manage-pdc-modal-actions button {
+        padding: 10px 15px;
+        border: 0;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .manage-pdc-cancel {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .manage-pdc-confirm {
+        background: #dc2626;
+        color: #fff;
+    }
+
+    .manage-pdc-confirm:hover {
+        background: #b91c1c;
+    }
+
+    .manage-pdc-confirm:disabled {
+        opacity: .65;
+        cursor: wait;
+    }
+
+    @media (max-width: 700px) {
+        .manage-pdc-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .manage-pdc-heading {
+            padding: 21px;
+        }
+
+        .manage-pdc-panel {
+            padding: 14px;
+        }
+    }
+</style>
+
+<section class="content">
+    <div class="manage-pdc-wrap">
+
+        {% if messages %}
+            <div aria-live="polite">
+                {% for message in messages %}
+                    <div class="manage-pdc-alert {{ message.tags }}" role="alert">
+                        {{ message }}
+                        <button type="button"
+                                class="manage-pdc-alert-close"
+                                aria-label="Close message"
+                                onclick="this.parentElement.remove()">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="manage-pdc-heading">
+            <h2>Manage PDC</h2>
+            <p>View, update and manage all your PDC records.</p>
+        </div>
+
+        <div class="manage-pdc-stats">
+            <div class="manage-pdc-stat">
+                <span>Total PDC Records</span>
+                <strong>{{ data|length }}</strong>
+            </div>
+            <div class="manage-pdc-stat">
+                <span>Record Management</span>
+                <strong>Easy</strong>
+            </div>
+            <div class="manage-pdc-stat">
+                <span>Quick Actions</span>
+                <strong>Update / Delete</strong>
+            </div>
+        </div>
+
+        <div class="manage-pdc-panel">
+            <div class="manage-pdc-panel-head">
+                <h3>PDC Records</h3>
+                <span class="manage-pdc-count">{{ data|length }} record{{ data|length|pluralize }}</span>
+                <a class="manage-pdc-btn manage-pdc-btn-add" href="{% url 'addpdc' %}">+ Add PDC</a>
+            </div>
+
+            <div class="manage-pdc-table-wrap">
+                <table class="manage-pdc-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Producer</th>
+                            <th>Type</th>
+                            <th>Time</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Location</th>
+                            <th>URL</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for datas in data %}
+                            <tr>
+                                <td><strong>{{ datas.title }}</strong></td>
+                                <td>{{ datas.producer|default:"—" }}</td>
+                                <td>{{ datas.get_types_display|default:"—" }}</td>
+                                <td>{{ datas.time|time:"H:i"|default:"—" }}</td>
+                                <td>{{ datas.startdate|date:"Y-m-d"|default:"—" }}</td>
+                                <td>{{ datas.enddate|date:"Y-m-d"|default:"—" }}</td>
+                                <td>{{ datas.location|default:"—" }}</td>
+                                <td>
+                                    {% if datas.urls %}
+                                        <a href="{{ datas.urls|escape }}"
+                                           target="_blank"
+                                           rel="noopener noreferrer">View URL ↗</a>
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="manage-pdc-actions">
+                                        <a class="manage-pdc-btn manage-pdc-btn-edit"
+                                           href="{% url 'updatepdc' datas.id %}">Update</a>
+                                        <form class="manage-pdc-delete-form"
+                                              method="post"
+                                              action="{% url 'deletes' datas.id %}"
+                                              data-title="{{ datas.title }}">
+                                            {% csrf_token %}
+                                            <button class="manage-pdc-btn manage-pdc-btn-delete"
+                                                    type="submit">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="9" class="manage-pdc-empty">
+                                    No PDC records found.
+                                    <a href="{% url 'addpdc' %}">Add a record</a>.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="manage-pdc-modal"
+     id="managePdcDeleteModal"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="managePdcDeleteHeading"
+     aria-describedby="managePdcDeleteText"
+     aria-hidden="true">
+    <div class="manage-pdc-modal-box">
+        <h3 id="managePdcDeleteHeading">Confirm deletion</h3>
+        <p id="managePdcDeleteText">Are you sure you want to delete this record? This cannot be undone.</p>
+        <div class="manage-pdc-modal-actions">
+            <button type="button" class="manage-pdc-cancel" id="managePdcCancelDelete">Cancel</button>
+            <button type="button" class="manage-pdc-confirm" id="managePdcConfirmDelete">Yes, delete</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const modal = document.getElementById('managePdcDeleteModal');
+    const cancelButton = document.getElementById('managePdcCancelDelete');
+    const confirmButton = document.getElementById('managePdcConfirmDelete');
+    const deleteText = document.getElementById('managePdcDeleteText');
+
+    if (!modal || !cancelButton || !confirmButton || !deleteText) {
+        return;
+    }
+
+    let pendingForm = null;
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        pendingForm = null;
+        confirmButton.disabled = false;
+        confirmButton.textContent = 'Yes, delete';
+    }
+
+    document.querySelectorAll('.manage-pdc-delete-form').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            pendingForm = form;
+            const title = form.getAttribute('data-title') || 'this record';
+            deleteText.textContent = 'Are you sure you want to delete "' + title + '"? This cannot be undone.';
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            cancelButton.focus();
+        });
+    });
+
+    cancelButton.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+            closeModal();
+        }
+    });
+
+    confirmButton.addEventListener('click', function () {
+        if (!pendingForm) {
+            return;
+        }
+        confirmButton.disabled = true;
+        confirmButton.textContent = 'Deleting...';
+
+        // Native submit preserves the original POST method and CSRF field.
+        HTMLFormElement.prototype.submit.call(pendingForm);
+    });
+})();
+</script>
+{% endblock contents %}

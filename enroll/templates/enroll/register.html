@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create User Account | PDC</title><style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:linear-gradient(135deg,#1565c0,#0d2e68);font-family:Arial,sans-serif;padding:20px}
+.card{width:min(100%,480px);background:#fff;border-radius:18px;padding:30px;box-shadow:0 18px 50px #061b3c40}
+h1{color:#0d47a1;margin-top:0}label{display:block;font-weight:bold;margin:14px 0 6px}input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:8px}
+button{width:100%;padding:13px;margin-top:20px;background:#1565c0;color:white;border:0;border-radius:8px;font-weight:bold;font-size:16px;cursor:pointer}
+.helptext,ul{color:#64748b;font-size:13px;line-height:1.7}.errorlist{color:#b91c1c}.bottom{text-align:center;margin-top:18px}
+</style></head><body><main class="card"><h1>Create User Account</h1>
+<p>Register as a PDC participant. New accounts receive standard User access.</p>
+<form method="post">{% csrf_token %}
+{% for field in form %}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}
+{% if field.help_text %}<div class="helptext">{{ field.help_text|safe }}</div>{% endif %}
+{% for error in field.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}{% endfor %}
+<button type="submit">Create account</button></form>
+<div class="bottom">Already registered? <a href="{% url 'login' %}">Sign in</a></div>
+</main></body></html>

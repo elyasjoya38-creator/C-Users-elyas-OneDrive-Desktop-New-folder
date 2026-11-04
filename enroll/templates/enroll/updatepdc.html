@@ -1,0 +1,250 @@
+{% extends 'enroll/index.html' %}
+
+{% block contents %}
+
+<style>
+    .update-wrap {
+        max-width: 950px;
+        margin: 25px auto;
+    }
+
+    .update-card {
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #e8edf5;
+        border-radius: 16px;
+        box-shadow: 0 5px 24px #1e375a12;
+    }
+
+    .update-heading {
+        padding: 24px 28px;
+        background: linear-gradient(120deg, #1565c0, #42a5f5);
+        color: #fff;
+    }
+
+    .update-heading h2 {
+        margin: 0 0 8px;
+        font-size: 24px;
+    }
+
+    .update-heading p {
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .update-body {
+        padding: 28px;
+    }
+
+    .update-body .field {
+        margin-bottom: 20px;
+    }
+
+    .update-body label {
+        display: block;
+        margin-bottom: 7px;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .update-body input,
+    .update-body select,
+    .update-body textarea {
+        display: block;
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #fff;
+        color: #1e293b;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .update-body input:focus,
+    .update-body select:focus,
+    .update-body textarea:focus {
+        border-color: #1565c0;
+        box-shadow: 0 0 0 3px #1565c022;
+    }
+
+    .update-body textarea {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .help-text {
+        display: block;
+        margin-top: 6px;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .field-errors {
+        margin-top: 6px;
+        color: #b91c1c;
+        font-size: 13px;
+    }
+
+    .field-errors ul,
+    .form-errors ul {
+        margin: 5px 0 0;
+        padding-left: 20px;
+    }
+
+    .form-errors {
+        margin-bottom: 20px;
+        padding: 13px 15px;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        background: #fef2f2;
+        color: #991b1b;
+        font-size: 14px;
+    }
+
+    .update-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #edf1f7;
+    }
+
+    .update-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .save-btn {
+        background: #1565c0;
+        color: #fff;
+    }
+
+    .save-btn:hover {
+        background: #0d47a1;
+    }
+
+    .cancel-btn {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .cancel-btn:hover {
+        background: #cbd5e1;
+    }
+
+    @media (max-width: 580px) {
+        .update-wrap {
+            margin: 12px auto;
+        }
+
+        .update-heading {
+            padding: 20px;
+        }
+
+        .update-heading h2 {
+            font-size: 21px;
+        }
+
+        .update-body {
+            padding: 20px;
+        }
+
+        .update-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .update-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<section class="content">
+    <div class="update-wrap">
+
+        <div class="update-card">
+
+            <div class="update-heading">
+                <h2>Update PDC</h2>
+                <p>
+                    Edit the details of:
+                    <strong>{{ data.title|default:"PDC record" }}</strong>
+                </p>
+            </div>
+
+            <div class="update-body">
+
+                {% if form.non_field_errors %}
+                    <div class="form-errors" role="alert">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <form
+                    method="post"
+                    action="{% url 'updatepdc' data.id %}"
+                >
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                        <div class="field">
+
+                            {{ field.label_tag }}
+
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <small class="help-text">
+                                    {{ field.help_text }}
+                                </small>
+                            {% endif %}
+
+                            {% if field.errors %}
+                                <div class="field-errors" role="alert">
+                                    {{ field.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+                    {% endfor %}
+
+                    <div class="update-actions">
+                        <button
+                            class="update-btn save-btn"
+                            type="submit"
+                        >
+                            Save Changes
+                        </button>
+
+                        <a
+                            class="update-btn cancel-btn"
+                            href="{% url 'managepdc' %}"
+                        >
+                            Cancel
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock contents %}

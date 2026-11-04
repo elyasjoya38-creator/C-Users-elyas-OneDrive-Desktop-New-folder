@@ -1,0 +1,265 @@
+{% extends 'enroll/index.html' %}
+
+{% block contents %}
+
+<style>
+    .add-wrap {
+        max-width: 950px;
+        margin: 25px auto;
+    }
+
+    .add-card {
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #e8edf5;
+        border-radius: 16px;
+        box-shadow: 0 5px 24px #1e375a12;
+    }
+
+    .add-heading {
+        padding: 24px 28px;
+        background: linear-gradient(120deg, #1565c0, #42a5f5);
+        color: #fff;
+    }
+
+    .add-heading h2 {
+        margin: 0 0 8px;
+        font-size: 24px;
+    }
+
+    .add-heading p {
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .add-body {
+        padding: 28px;
+    }
+
+    .add-body .field {
+        margin-bottom: 20px;
+    }
+
+    .add-body label {
+        display: block;
+        margin-bottom: 7px;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .add-body input,
+    .add-body select,
+    .add-body textarea {
+        display: block;
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #fff;
+        color: #1e293b;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .add-body input:focus,
+    .add-body select:focus,
+    .add-body textarea:focus {
+        border-color: #1565c0;
+        box-shadow: 0 0 0 3px #1565c022;
+    }
+
+    .add-body textarea {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .help-text {
+        display: block;
+        margin-top: 6px;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .field-errors {
+        margin-top: 6px;
+        color: #b91c1c;
+        font-size: 13px;
+    }
+
+    .form-errors {
+        margin-bottom: 20px;
+        padding: 13px 15px;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        background: #fef2f2;
+        color: #991b1b;
+        font-size: 14px;
+    }
+
+    .notice {
+        margin-bottom: 12px;
+        padding: 12px 15px;
+        border-radius: 8px;
+        background: #e8f8ee;
+        color: #166534;
+        font-size: 14px;
+    }
+
+    .notice.error {
+        background: #fde8e8;
+        color: #991b1b;
+    }
+
+    .add-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #edf1f7;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .save-btn {
+        background: #1565c0;
+        color: #fff;
+    }
+
+    .save-btn:hover {
+        background: #0d47a1;
+    }
+
+    .cancel-btn {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .cancel-btn:hover {
+        background: #cbd5e1;
+    }
+
+    @media (max-width: 580px) {
+        .add-wrap {
+            margin: 12px auto;
+        }
+
+        .add-heading {
+            padding: 20px;
+        }
+
+        .add-heading h2 {
+            font-size: 21px;
+        }
+
+        .add-body {
+            padding: 20px;
+        }
+
+        .add-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .action-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<section class="content">
+    <div class="add-wrap">
+
+        <div class="add-card">
+
+            <div class="add-heading">
+                <h2>Add PDC</h2>
+                <p>
+                    Create a new professional development record.
+                </p>
+            </div>
+
+            <div class="add-body">
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div
+                            class="notice {% if message.tags == 'error' %}error{% endif %}"
+                            role="alert"
+                        >
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if form.non_field_errors %}
+                    <div class="form-errors" role="alert">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'addpdc' %}">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                        <div class="field">
+
+                            {{ field.label_tag }}
+
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <small class="help-text">
+                                    {{ field.help_text }}
+                                </small>
+                            {% endif %}
+
+                            {% if field.errors %}
+                                <div class="field-errors" role="alert">
+                                    {{ field.errors }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+                    {% endfor %}
+
+                    <div class="add-actions">
+                        <button
+                            class="action-btn save-btn"
+                            type="submit"
+                        >
+                            Save PDC
+                        </button>
+
+                        <a
+                            class="action-btn cancel-btn"
+                            href="{% url 'managepdc' %}"
+                        >
+                            Cancel
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock contents %}
