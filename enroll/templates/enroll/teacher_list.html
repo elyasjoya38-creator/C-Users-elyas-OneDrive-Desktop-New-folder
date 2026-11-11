@@ -1,92 +1,29 @@
 {% extends 'enroll/index.html' %}
 
 {% block contents %}
-
-<form method="GET">
-
-    <input
-        type="text"
-        name="search"
-        placeholder="Search Teacher..."
-    >
-
-    <button type="submit">
-        Search
-    </button>
-
-</form>
-
 <div class="panel">
-
-<div style="display:flex;justify-content:space-between;margin-bottom:20px;">
-
-<h2>👨‍🏫 Teachers Management</h2>
-
-<a class="primary"
-href="{% url 'add_teacher' %}">
-➕ Add Teacher
-</a>
-
+  <h2>👨‍🏫 Teachers Management</h2>
+  <form method="get">
+    <input type="search" name="search" value="{{ request.GET.search }}" placeholder="Search teachers">
+    <button type="submit">Search</button>
+    <a class="primary" href="{% url 'add_teacher' %}">➕ Add Teacher</a>
+  </form>
+  <table>
+    <thead><tr><th>Name</th><th>Specialization</th><th>Email</th><th>Phone</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for teacher in teachers %}
+      <tr>
+        <td><a href="{% url 'teacher_detail' teacher.id %}">{{ teacher.full_name }}</a></td>
+        <td>{{ teacher.specialization }}</td><td>{{ teacher.email }}</td><td>{{ teacher.phone }}</td>
+        <td>
+          <a href="{% url 'edit_teacher' teacher.id %}">Edit</a>
+          <form method="post" action="{% url 'delete_teacher' teacher.id %}" style="display:inline" onsubmit="return confirm('Delete this teacher?');">
+            {% csrf_token %}<button type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="5">No teachers found.</td></tr>{% endfor %}
+    </tbody>
+  </table>
 </div>
-
-<table>
-
-<thead>
-<tr>
-<th>Name</th>
-<th>Specialization</th>
-<th>Email</th>
-<th>Phone</th>
-</tr>
-</thead>
-
-<tbody>
-
-{% for teacher in teachers %}
-
-<tr>
-
-    <td>
-
-<a href="{% url 'teacher_detail' teacher.id %}">
-    {{ teacher.full_name }}
-</a>
-
-</td>
-    <td>{{ teacher.specialization }}</td>
-    <td>{{ teacher.email }}</td>
-    <td>{{ teacher.phone }}</td>
-
-    <td>
-
-        <a href="{% url 'edit_teacher' teacher.id %}">
-            ✏ Edit
-        </a>
-
-        |
-
-        <a href="{% url 'delete_teacher' teacher.id %}">
-            🗑 Delete
-        </a>
-
-    </td>
-
-</tr>
-
-{% empty %}
-
-<tr>
-    <td colspan="5">
-        No teachers found.
-    </td>
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-</div>
-
 {% endblock %}

@@ -1,60 +1,14 @@
 {% extends 'enroll/index.html' %}
-
 {% block contents %}
-
 <div class="panel">
-
-<div style="display:flex;justify-content:space-between;margin-bottom:20px;">
-
-<h2>📚 Courses Management</h2>
-
-<a class="primary"
-href="{% url 'add_course' %}">
-➕ Add Course
-</a>
-
+  <h2>Courses Management</h2>
+  <form method="get"><input type="search" name="search" value="{{ request.GET.search }}" placeholder="Search courses"><button type="submit">Search</button><a class="primary" href="{% url 'add_course' %}">Add Course</a></form>
+  <div style="overflow-x:auto"><table>
+    <thead><tr><th>Course</th><th>Teacher</th><th>Start Date</th><th>End Date</th><th>Actions</th></tr></thead>
+    <tbody>{% for course in courses %}<tr>
+      <td><a href="{% url 'course_detail' course.id %}">{{ course.course_name }}</a></td><td>{{ course.teacher }}</td><td>{{ course.start_date }}</td><td>{{ course.end_date }}</td>
+      <td><a href="{% url 'edit_course' course.id %}">Edit</a><form method="post" action="{% url 'delete_course' course.id %}" style="display:inline" onsubmit="return confirm('Delete this course?');">{% csrf_token %}<button type="submit">Delete</button></form></td>
+    </tr>{% empty %}<tr><td colspan="5">No courses found.</td></tr>{% endfor %}</tbody>
+  </table></div>
 </div>
-
-<table>
-
-<thead>
-<tr>
-<th>Course</th>
-<th>Teacher</th>
-<th>Start Date</th>
-<th>End Date</th>
-</tr>
-</thead>
-
-<tbody>
-
-{% for course in courses %}
-
-<tr>
-<td>
-
-<a href="{% url 'course_detail' course.id %}">
-    {{ course.course_name }}
-</a>
-
-</td>
-<td>{{ course.teacher }}</td>
-<td>{{ course.start_date }}</td>
-<td>{{ course.end_date }}</td>
-</tr>
-
-{% empty %}
-
-<tr>
-<td colspan="4">No Courses Found</td>
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-</div>
-
 {% endblock %}

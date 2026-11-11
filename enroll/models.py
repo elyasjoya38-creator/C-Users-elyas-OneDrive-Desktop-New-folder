@@ -1,4 +1,6 @@
+from django.core.exceptions import ValidationError
 from django.db import models
+
 
 typelist = (
     ("Seminar", "Seminar"), ("Workshop", "Workshop"), ("Course", "Course"),
@@ -16,10 +18,12 @@ class pdc_detials(models.Model):
     enddate = models.DateField(null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
     urls = models.URLField(max_length=200, null=True, blank=True)
+
     class Meta:
         ordering = ["-id"]
         verbose_name = "PDC record"
         verbose_name_plural = "PDC records"
+
     def __str__(self):
         return self.title
 
@@ -29,6 +33,7 @@ class Teacher(models.Model):
     specialization = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=20)
+    photo = models.ImageField(upload_to="teachers/", null=True, blank=True)
 
     def __str__(self):
         return self.full_name
@@ -36,15 +41,15 @@ class Teacher(models.Model):
 
 class Course(models.Model):
     course_name = models.CharField(max_length=100)
-
-    teacher = models.ForeignKey(
-        Teacher,
-        on_delete=models.CASCADE
-    )
-
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     start_date = models.DateField()
     end_date = models.DateField()
     description = models.TextField()
+
+    def clean(self):
+        super().clean()
+        if self.start_date and self.end_date and self.end_date < self.start_date:
+            raise ValidationError({"end_date": "End date cannot be earlier than start date."})
 
     def __str__(self):
         return self.course_name
@@ -57,87 +62,39 @@ class Student(models.Model):
     department = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=20)
+    photo = models.ImageField(upload_to="students/", null=True, blank=True)
 
     def __str__(self):
         return self.full_name
 
 
 class Enrollment(models.Model):
-
-    student = models.ForeignKey(
-        Student,
-        on_delete=models.CASCADE
-    )
-
-    course = models.ForeignKey(
-        Course,
-        on_delete=models.CASCADE
-    )
-
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     enrolled_at = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.student} - {self.course}"
 
-ATTENDANCE_STATUS = (
-    ("Present", "Present"),
-    ("Absent", "Absent"),
-    ("Late", "Late"),
-)
+
+ATTENDANCE_STATUS = (("Present", "Present"), ("Absent", "Absent"), ("Late", "Late"))
+
 
 class Attendance(models.Model):
-
-    student = models.ForeignKey(
-        Student,
-        on_delete=models.CASCADE
-    )
-
-    course = models.ForeignKey(
-        Course,
-        on_delete=models.CASCADE
-    )
-
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     date = models.DateField()
-
-    status = models.CharField(
-        max_length=20,
-        choices=ATTENDANCE_STATUS
-    )
+    status = models.CharField(max_length=20, choices=ATTENDANCE_STATUS)
 
     def __str__(self):
         return f"{self.student} - {self.status}"
 
-    
+
 class Certificate(models.Model):
-    student = models.ForeignKey(
-        Student,
-        on_delete=models.CASCADE
-    )
-
-    course = models.ForeignKey(
-        Course,
-        on_delete=models.CASCADE
-    )
-
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     issue_date = models.DateField()
-
-    certificate_no = models.CharField(
-        max_length=50,
-        unique=True
-    )
+    certificate_no = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.certificate_no
-
-photo = models.ImageField(
-    upload_to="students/",
-    null=True,
-    blank=True
-)
-
-photo = models.ImageField(
-    upload_to="teachers/",
-    null=True,
-    blank=True
-)
-

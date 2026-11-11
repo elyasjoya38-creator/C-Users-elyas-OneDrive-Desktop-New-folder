@@ -3,8 +3,7 @@ from . import views
 
 urlpatterns = [
     path("login/", views.user_login, name="login"),
-    path("students/", views.student_list, name="student_list"),
-    path("students/add/", views.add_student, name="add_student"),
+    path("register/", views.user_register, name="register"),
     path("logout/", views.user_logout, name="logout"),
     path("", views.home, name="home"),
     path("my-account/", views.user_dashboard, name="user_dashboard"),
@@ -12,114 +11,26 @@ urlpatterns = [
     path("managepdc/", views.managepdc, name="managepdc"),
     path("updatepdc/<int:id>/", views.updatepdc, name="updatepdc"),
     path("deletes/<int:id>/", views.deletes, name="deletes"),
+    path("students/", views.student_list, name="student_list"),
+    path("students/add/", views.add_student, name="add_student"),
+    path("students/edit/<int:id>/", views.edit_student, name="edit_student"),
+    path("students/delete/<int:id>/", views.delete_student, name="delete_student"),
+    path("students/<int:id>/", views.student_detail, name="student_detail"),
     path("teachers/", views.teacher_list, name="teacher_list"),
     path("teachers/add/", views.add_teacher, name="add_teacher"),
+    path("teachers/edit/<int:id>/", views.edit_teacher, name="edit_teacher"),
+    path("teachers/delete/<int:id>/", views.delete_teacher, name="delete_teacher"),
+    path("teachers/<int:id>/", views.teacher_detail, name="teacher_detail"),
     path("courses/", views.course_list, name="course_list"),
     path("courses/add/", views.add_course, name="add_course"),
-
-path(
-    "enrollments/",
-    views.enrollment_list,
-    name="enrollment_list"
-),
-
-path(
-    "enrollments/add/",
-    views.add_enrollment,
-    name="add_enrollment"
-),
-
-path(
-    "attendance/",
-    views.attendance_list,
-    name="attendance_list"
-),
-
-path(
-    "attendance/add/",
-    views.add_attendance,
-    name="add_attendance"
-),
-
-
-path(
-        "certificates/",
-        views.certificate_list,
-        name="certificate_list"
-    ),
-
-path(
-        "certificates/add/",
-        views.add_certificate,
-        name="add_certificate"
-    ),
-
-path(
-
-    "students/edit/<int:id>/",
-    views.edit_student,
-    name="edit_student"
-),
-
-
-path(
-    "students/delete/<int:id>/",
-    views.delete_student,
-    name="delete_student"
-),
-
-path(
-    "reports/",
-    views.reports,
-    name="reports"
-),
-
-path(
-    "teachers/edit/<int:id>/",
-    views.edit_teacher,
-    name="edit_teacher"
-),
-
-path(
-    "teachers/delete/<int:id>/",
-    views.delete_teacher,
-    name="delete_teacher"
-),
-
-path(
-    "courses/edit/<int:id>/",
-    views.edit_course,
-    name="edit_course"
-),
-
-path(
-    "courses/delete/<int:id>/",
-    views.delete_course,
-    name="delete_course"
-),
-
-path(
-    "students/<int:id>/",
-    views.student_detail,
-    name="student_detail"
-),
-
-path(
-    "teachers/<int:id>/",
-    views.teacher_detail,
-    name="teacher_detail"
-),
-
-path(
-    "courses/<int:id>/",
-    views.course_detail,
-    name="course_detail"
-),
-
-
-
-
+    path("courses/edit/<int:id>/", views.edit_course, name="edit_course"),
+    path("courses/delete/<int:id>/", views.delete_course, name="delete_course"),
+    path("courses/<int:id>/", views.course_detail, name="course_detail"),
+    path("enrollments/", views.enrollment_list, name="enrollment_list"),
+    path("enrollments/add/", views.add_enrollment, name="add_enrollment"),
+    path("attendance/", views.attendance_list, name="attendance_list"),
+    path("attendance/add/", views.add_attendance, name="add_attendance"),
+    path("certificates/", views.certificate_list, name="certificate_list"),
+    path("certificates/add/", views.add_certificate, name="add_certificate"),
+    path("reports/", views.reports, name="reports"),
 ]
-
-
-
