@@ -7,52 +7,96 @@ from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
-from .forms import addpdcform, StudentForm, TeacherForm, CourseForm, EnrollmentForm, AttendanceForm, CertificateForm
-from .models import pdc_detials, Student, Teacher, Course, Enrollment, Attendance, Certificate
+from .forms import (
+    addpdcform, StudentForm, TeacherForm, CourseForm, EnrollmentForm,
+    AttendanceForm, CertificateForm,
+)
+from .models import (
+    pdc_detials, Student, Teacher, Course, Enrollment, Attendance, Certificate,
+)
+
+
+def user_role(user):
+    """Return the most privileged application role assigned to a user."""
+    if not user.is_authenticated:
+        return "anonymous"
+    group_names = set(user.groups.values_list("name", flat=True))
+    if user.is_staff or user.is_superuser or "Admin" in group_names:
+        return "Admin"
+    if "Teacher" in group_names:
+        return "Teacher"
+    if "Student" in group_names:
+        return "Student"
+    return "User"
 
 
 def is_admin(user):
-    return user.groups.filter(name="Admin").exists()
+    return user_role(user) == "Admin"
 
 
 def is_teacher(user):
-    return user.groups.filter(name="Teacher").exists()
+    return user_role(user) == "Teacher"
 
 
 def is_student(user):
-    return user.groups.filter(name="Student").exists()
+    return user_role(user) == "Student"
 
 
-def is_pdc_admin(user):
-    return user.is_authenticated and (user.is_staff or user.is_superuser)
+admin_required = user_passes_test(is_admin, login_url="user_dashboard")
+teacher_required = user_passes_test(lambda user: user_role(user) in ("Admin", "Teacher"), login_url="user_dashboard")
+student_required = user_passes_test(lambda user: user_role(user) in ("Admin", "Student"), login_url="user_dashboard")
 
 
-admin_required = user_passes_test(is_pdc_admin, login_url="user_dashboard")
+def dashboard_redirect(user):
+    return redirect("home" if user_role(user) == "Admin" else "user_dashboard")
 
 
 @login_required
 def home(request):
-    if not is_pdc_admin(request.user):
+    if user_role(request.user) != "Admin":
         return redirect("user_dashboard")
     today = timezone.localdate()
     records = pdc_detials.objects.all()
     return render(request, "enroll/index.html", {
-        "active_page": "home", "total_pdcs": records.count(),
+        "active_page": "home",
+        "total_pdcs": records.count(),
         "seminar_count": records.filter(types="Seminar").count(),
         "workshop_count": records.filter(types="Workshop").count(),
         "upcoming_pdcs": records.filter(startdate__gte=today).count(),
         "recent_pdcs": records.order_by("-id")[:5],
-        "total_students": Student.objects.count(), "total_teachers": Teacher.objects.count(),
-        "total_courses": Course.objects.count(), "total_enrollments": Enrollment.objects.count(),
-        "total_attendance": Attendance.objects.count(), "total_certificates": Certificate.objects.count(),
+        "total_students": Student.objects.count(),
+        "total_teachers": Teacher.objects.count(),
+        "total_courses": Course.objects.count(),
+        "total_enrollments": Enrollment.objects.count(),
+        "total_attendance": Attendance.objects.count(),
+        "total_certificates": Certificate.objects.count(),
     })
 
 
 @login_required
 def user_dashboard(request):
-    if is_pdc_admin(request.user):
+    role = user_role(request.user)
+    if role == "Admin":
         return redirect("home")
-    return render(request, "enroll/user_dashboard.html", {"active_page": "user_dashboard"})
+    context = {"active_page": "user_dashboard", "role": role}
+    if role == "Teacher":
+        try:
+            teacher = request.user.teacher_profile
+        except Teacher.DoesNotExist:
+            teacher = None
+        context["profile"] = teacher
+        context["courses"] = Course.objects.filter(teacher=teacher).select_related("teacher") if teacher else Course.objects.none()
+        context["attendance"] = Attendance.objects.filter(course__teacher=teacher).select_related("student", "course") if teacher else Attendance.objects.none()
+    elif role == "Student":
+        try:
+            student = request.user.student_profile
+        except Student.DoesNotExist:
+            student = None
+        context["profile"] = student
+        context["enrollments"] = Enrollment.objects.filter(student=student).select_related("course", "course__teacher") if student else Enrollment.objects.none()
+        context["attendance"] = Attendance.objects.filter(student=student).select_related("course") if student else Attendance.objects.none()
+        context["certificates"] = Certificate.objects.filter(student=student).select_related("course") if student else Certificate.objects.none()
+    return render(request, "enroll/user_dashboard.html", context)
 
 
 @admin_required
@@ -96,7 +140,7 @@ def deletes(request, id):
 
 def user_register(request):
     if request.user.is_authenticated:
-        return redirect("home")
+        return dashboard_redirect(request.user)
     form = UserCreationForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         user = form.save(commit=False)
@@ -110,16 +154,16 @@ def user_register(request):
 
 def user_login(request):
     if request.user.is_authenticated:
-        return redirect("home")
+        return dashboard_redirect(request.user)
     if request.method == "POST":
         user = authenticate(request, username=request.POST.get("username", "").strip(), password=request.POST.get("password", ""))
         if user is not None:
             login(request, user)
             next_url = request.POST.get("next") or request.GET.get("next", "")
             if next_url and url_has_allowed_host_and_scheme(url=next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
-                if is_pdc_admin(user) or next_url not in ("/addpdc/", "/managepdc/"):
+                if user_role(user) == "Admin" or next_url not in ("/addpdc/", "/managepdc/"):
                     return redirect(next_url)
-            return redirect("home")
+            return dashboard_redirect(user)
         messages.error(request, "Username or password is incorrect.")
     return render(request, "enroll/login.html")
 
@@ -133,7 +177,7 @@ def user_logout(request):
 
 @admin_required
 def student_list(request):
-    students = Student.objects.all()
+    students = Student.objects.select_related("user")
     search = request.GET.get("search", "").strip()
     if search:
         students = students.filter(full_name__icontains=search)
@@ -158,7 +202,7 @@ def edit_student(request, id):
         form.save()
         messages.success(request, "Student updated successfully")
         return redirect("student_list")
-    return render(request, "enroll/edit_student.html", {"form": form, "student": student})
+    return render(request, "enroll/edit_student.html", {"form": form, "student": student, "active_page": "students"})
 
 
 @admin_required
@@ -171,7 +215,7 @@ def delete_student(request, id):
 
 @admin_required
 def teacher_list(request):
-    teachers = Teacher.objects.all()
+    teachers = Teacher.objects.select_related("user")
     search = request.GET.get("search", "").strip()
     if search:
         teachers = teachers.filter(full_name__icontains=search)
@@ -196,7 +240,7 @@ def edit_teacher(request, id):
         form.save()
         messages.success(request, "Teacher updated successfully")
         return redirect("teacher_list")
-    return render(request, "enroll/edit_teacher.html", {"form": form, "teacher": teacher})
+    return render(request, "enroll/edit_teacher.html", {"form": form, "teacher": teacher, "active_page": "teachers"})
 
 
 @admin_required
@@ -234,7 +278,7 @@ def edit_course(request, id):
         form.save()
         messages.success(request, "Course updated successfully")
         return redirect("course_list")
-    return render(request, "enroll/edit_course.html", {"form": form, "course": course})
+    return render(request, "enroll/edit_course.html", {"form": form, "course": course, "active_page": "courses"})
 
 
 @admin_required
@@ -295,12 +339,13 @@ def add_certificate(request):
 
 @admin_required
 def reports(request):
-    return render(request, "enroll/reports.html", {
+    context = {
         "total_students": Student.objects.count(), "total_teachers": Teacher.objects.count(),
         "total_courses": Course.objects.count(), "total_enrollments": Enrollment.objects.count(),
         "total_attendance": Attendance.objects.count(), "total_certificates": Certificate.objects.count(),
         "total_pdcs": pdc_detials.objects.count(), "active_page": "reports",
-    })
+    }
+    return render(request, "enroll/reports.html", context)
 
 
 @admin_required

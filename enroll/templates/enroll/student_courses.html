@@ -1,0 +1,5 @@
+{% extends 'enroll/index.html' %}
+{% block contents %}
+<section class="hero"><h1>کورس‌های من</h1><p>کورس‌هایی که در آن‌ها ثبت‌نام هستید.</p></section>
+<div class="panel"><div class="tablewrap"><table><thead><tr><th>کورس</th><th>استاد</th><th>تاریخ آغاز</th><th>تاریخ پایان</th><th>تاریخ ثبت‌نام</th></tr></thead><tbody>{% for enrollment in enrollments %}<tr><td>{{ enrollment.course.course_name }}</td><td>{{ enrollment.course.teacher.full_name }}</td><td>{{ enrollment.course.start_date }}</td><td>{{ enrollment.course.end_date }}</td><td>{{ enrollment.enrolled_at }}</td></tr>{% empty %}<tr><td colspan="5">ثبت‌نامی برای حساب شما موجود نیست.</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

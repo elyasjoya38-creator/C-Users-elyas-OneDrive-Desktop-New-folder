@@ -1,20 +1,17 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>پنل اشتراک‌کننده | سیستم PDC</title>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#f3f7fc;font-family:Tahoma,Arial,sans-serif;color:#243247}
-header{background:#155eaa;color:white;padding:22px 6%;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-main{max-width:980px;margin:42px auto;padding:0 18px}.card{background:white;border-radius:16px;padding:28px;box-shadow:0 8px 28px #17365d12}
-h1{font-size:25px;margin:0 0 12px}.muted{color:#64748b;line-height:1.9}
-a{color:#155eaa;text-decoration:none;font-weight:bold}.logout{color:white;border:1px solid #ffffff88;padding:9px 15px;border-radius:8px}
-</style></head>
-<body>
-<header><strong>سیستم مدیریت مرکز توسعه حرفه‌ای دانشگاه غرجستان</strong>
-<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="logout" type="submit">خروج از حساب</button></form></header>
-<main><section class="card">
-<h1>خوش آمدید، {{ request.user.get_username }}</h1>
-<p class="muted">این پنل شخصی اشتراک‌کننده است. در این بخش فقط معلومات مربوط به حساب خودتان نمایش داده می‌شود.</p>
-<p class="muted">امکانات ثبت‌نام در کورس‌ها و مشاهده وضعیت درخواست‌ها در مرحله بعدی توسعه اضافه خواهد شد.</p>
-</section></main></body></html>
+{% extends 'enroll/index.html' %}
+{% block contents %}
+<section class="hero"><h1>خوش آمدید، {{ request.user.get_username }}</h1><p><span class="role-badge">{{ role }}</span> · پنل اختصاصی شما</p></section>
+{% if role == "Teacher" %}
+  {% if not profile %}<section class="panel"><h2>پروفایل استاد وصل نشده</h2><p>برای مشاهده کورس‌ها، مدیر باید حساب شما را به پروفایل استاد مربوط وصل کند.</p></section>{% else %}
+    <section class="stats"><div class="stat"><span>کورس‌های من</span><strong>{{ courses|length }}</strong></div><div class="stat"><span>سوابق حاضری شاگردان</span><strong>{{ attendance|length }}</strong></div></section>
+    <section class="panel"><div class="toolbar"><h2>کورس‌های من</h2><a class="primary" href="{% url 'teacher_my_courses' %}">مشاهده همه</a></div><div class="tablewrap"><table><thead><tr><th>کورس</th><th>آغاز</th><th>پایان</th></tr></thead><tbody>{% for course in courses|slice:":5" %}<tr><td>{{ course.course_name }}</td><td>{{ course.start_date }}</td><td>{{ course.end_date }}</td></tr>{% empty %}<tr><td colspan="3">کورس ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div></section>
+  {% endif %}
+{% elif role == "Student" %}
+  {% if not profile %}<section class="panel"><h2>پروفایل شاگرد وصل نشده</h2><p>برای دیدن کورس‌ها و حاضری، مدیر باید حساب شما را به پروفایل شاگرد مربوط وصل کند.</p></section>{% else %}
+    <section class="stats"><div class="stat"><span>ثبت‌نام‌ها</span><strong>{{ enrollments|length }}</strong></div><div class="stat"><span>حاضری‌ها</span><strong>{{ attendance|length }}</strong></div><div class="stat"><span>تصدیق‌نامه‌ها</span><strong>{{ certificates|length }}</strong></div></section>
+    <section class="panel"><div class="toolbar"><h2>کورس‌های من</h2><a class="primary" href="{% url 'student_my_courses' %}">مشاهده همه</a></div><div class="tablewrap"><table><thead><tr><th>کورس</th><th>استاد</th><th>تاریخ ثبت‌نام</th></tr></thead><tbody>{% for enrollment in enrollments|slice:":5" %}<tr><td>{{ enrollment.course.course_name }}</td><td>{{ enrollment.course.teacher.full_name }}</td><td>{{ enrollment.enrolled_at }}</td></tr>{% empty %}<tr><td colspan="3">هنوز در کورسی ثبت‌نام نشده‌اید.</td></tr>{% endfor %}</tbody></table></div></section>
+  {% endif %}
+{% else %}
+<section class="panel"><h2>حساب کاربری</h2><p>حساب شما فعلاً نقش استاد یا شاگرد ندارد. برای دسترسی به پنل مربوط، با مدیر سیستم تماس بگیرید.</p></section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,5 @@
+{% extends 'enroll/index.html' %}
+{% block contents %}
+<section class="hero"><h1>تصدیق‌نامه‌های من</h1><p>اسناد صادرشده برای شما.</p></section>
+<div class="panel"><div class="tablewrap"><table><thead><tr><th>شماره تصدیق‌نامه</th><th>کورس</th><th>تاریخ صدور</th></tr></thead><tbody>{% for certificate in certificates %}<tr><td>{{ certificate.certificate_no }}</td><td>{{ certificate.course.course_name }}</td><td>{{ certificate.issue_date }}</td></tr>{% empty %}<tr><td colspan="3">تصدیق‌نامه‌ای ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

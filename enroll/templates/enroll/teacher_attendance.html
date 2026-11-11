@@ -1,0 +1,5 @@
+{% extends 'enroll/index.html' %}
+{% block contents %}
+<section class="hero"><h1>حاضری شاگردان</h1><p>فقط حاضری کورس‌های شما نمایش داده می‌شود.</p></section>
+<div class="panel"><div class="tablewrap"><table><thead><tr><th>شاگرد</th><th>کورس</th><th>تاریخ</th><th>وضعیت</th></tr></thead><tbody>{% for row in attendance %}<tr><td>{{ row.student.full_name }}</td><td>{{ row.course.course_name }}</td><td>{{ row.date }}</td><td>{{ row.get_status_display }}</td></tr>{% empty %}<tr><td colspan="4">رکورد حاضری موجود نیست.</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

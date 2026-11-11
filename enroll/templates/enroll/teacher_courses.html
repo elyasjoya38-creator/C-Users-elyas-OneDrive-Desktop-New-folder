@@ -1,0 +1,5 @@
+{% extends 'enroll/index.html' %}
+{% block contents %}
+<section class="hero"><h1>کورس‌های من</h1><p>فهرست کورس‌هایی که تدریس می‌کنید.</p></section>
+<div class="panel"><div class="tablewrap"><table><thead><tr><th>کورس</th><th>تاریخ آغاز</th><th>تاریخ پایان</th><th>شرح</th></tr></thead><tbody>{% for course in courses %}<tr><td>{{ course.course_name }}</td><td>{{ course.start_date }}</td><td>{{ course.end_date }}</td><td>{{ course.description|truncatewords:18 }}</td></tr>{% empty %}<tr><td colspan="4">کورس مرتبط با حساب شما پیدا نشد.</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}
