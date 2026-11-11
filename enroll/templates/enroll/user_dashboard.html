@@ -1,17 +1,69 @@
 {% extends 'enroll/index.html' %}
 {% block contents %}
-<section class="hero"><h1>خوش آمدید، {{ request.user.get_username }}</h1><p><span class="role-badge">{{ role }}</span> · پنل اختصاصی شما</p></section>
-{% if role == "Teacher" %}
-  {% if not profile %}<section class="panel"><h2>پروفایل استاد وصل نشده</h2><p>برای مشاهده کورس‌ها، مدیر باید حساب شما را به پروفایل استاد مربوط وصل کند.</p></section>{% else %}
-    <section class="stats"><div class="stat"><span>کورس‌های من</span><strong>{{ courses|length }}</strong></div><div class="stat"><span>سوابق حاضری شاگردان</span><strong>{{ attendance|length }}</strong></div></section>
-    <section class="panel"><div class="toolbar"><h2>کورس‌های من</h2><a class="primary" href="{% url 'teacher_my_courses' %}">مشاهده همه</a></div><div class="tablewrap"><table><thead><tr><th>کورس</th><th>آغاز</th><th>پایان</th></tr></thead><tbody>{% for course in courses|slice:":5" %}<tr><td>{{ course.course_name }}</td><td>{{ course.start_date }}</td><td>{{ course.end_date }}</td></tr>{% empty %}<tr><td colspan="3">کورس ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div></section>
+  <section class="hero">
+    <h1>خوش آمدید، {{ request.user.get_username }}</h1>
+    <p><span class="role-pill">{{ user_role }}</span> · پنل اختصاصی شما</p>
+  </section>
+
+  {% if user_role == 'Teacher' %}
+    <section class="stats">
+      <div class="stat"><span>کورس‌های من</span><strong>{{ courses|length|default:0 }}</strong></div>
+      <div class="stat"><span>حاضری</span><strong>{{ attendance|length|default:0 }}</strong></div>
+    </section>
+
+    <section class="panel">
+      <div class="toolbar">
+        <h2>کورس‌های من</h2>
+        <a class="primary" href="{% url 'course_list' %}">مشاهده همه</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>کورس</th><th>آغاز</th><th>پایان</th></tr></thead>
+          <tbody>
+            {% for course in courses|slice:':5' %}
+              <tr><td>{{ course.course_name }}</td><td>{{ course.start_date }}</td><td>{{ course.end_date }}</td></tr>
+            {% empty %}
+              <tr><td colspan="3">کورس ثبت نشده است.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  {% elif user_role == 'Student' %}
+    <section class="stats">
+      <div class="stat"><span>ثبت‌نام‌ها</span><strong>{{ enrollments|length|default:0 }}</strong></div>
+      <div class="stat"><span>حاضری‌ها</span><strong>{{ attendance|length|default:0 }}</strong></div>
+      <div class="stat"><span>گواهی‌ها</span><strong>{{ certificates|length|default:0 }}</strong></div>
+    </section>
+
+    <section class="panel">
+      <div class="toolbar">
+        <h2>کورس‌های من</h2>
+        <a class="primary" href="{% url 'course_list' %}">مشاهده همه</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>کورس</th><th>استاد</th><th>ثبت‌نام</th></tr></thead>
+          <tbody>
+            {% for enrollment in enrollments|slice:':5' %}
+              <tr>
+                <td>{{ enrollment.course.course_name }}</td>
+                <td>{{ enrollment.course.teacher.full_name }}</td>
+                <td>{{ enrollment.enrolled_at }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="3">هنوز در کورسی ثبت‌نام نشده‌اید.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  {% else %}
+    <section class="panel">
+      <h2>حساب کاربری</h2>
+      <p>حساب شما نقشی در سیستم ندارد؛ برای دسترسی کامل به داشبورد، در گروه مناسب قرار بگیرید.</p>
+    </section>
   {% endif %}
-{% elif role == "Student" %}
-  {% if not profile %}<section class="panel"><h2>پروفایل شاگرد وصل نشده</h2><p>برای دیدن کورس‌ها و حاضری، مدیر باید حساب شما را به پروفایل شاگرد مربوط وصل کند.</p></section>{% else %}
-    <section class="stats"><div class="stat"><span>ثبت‌نام‌ها</span><strong>{{ enrollments|length }}</strong></div><div class="stat"><span>حاضری‌ها</span><strong>{{ attendance|length }}</strong></div><div class="stat"><span>تصدیق‌نامه‌ها</span><strong>{{ certificates|length }}</strong></div></section>
-    <section class="panel"><div class="toolbar"><h2>کورس‌های من</h2><a class="primary" href="{% url 'student_my_courses' %}">مشاهده همه</a></div><div class="tablewrap"><table><thead><tr><th>کورس</th><th>استاد</th><th>تاریخ ثبت‌نام</th></tr></thead><tbody>{% for enrollment in enrollments|slice:":5" %}<tr><td>{{ enrollment.course.course_name }}</td><td>{{ enrollment.course.teacher.full_name }}</td><td>{{ enrollment.enrolled_at }}</td></tr>{% empty %}<tr><td colspan="3">هنوز در کورسی ثبت‌نام نشده‌اید.</td></tr>{% endfor %}</tbody></table></div></section>
-  {% endif %}
-{% else %}
-<section class="panel"><h2>حساب کاربری</h2><p>حساب شما فعلاً نقش استاد یا شاگرد ندارد. برای دسترسی به پنل مربوط، با مدیر سیستم تماس بگیرید.</p></section>
-{% endif %}
 {% endblock %}

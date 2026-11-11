@@ -3,7 +3,6 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Set DJANGO_SECRET_KEY to a long, random value in every deployed environment.
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-local-development-only")
 DEBUG = os.environ.get("DEBUG", "False").lower() in {"1", "true", "yes", "on"}
 ALLOWED_HOSTS = [
@@ -21,6 +20,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "enroll",
 ]
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -30,17 +30,23 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
 ROOT_URLCONF = "pdc.urls"
+
 TEMPLATES = [{
     "BACKEND": "django.template.backends.django.DjangoTemplates",
     "DIRS": [],
     "APP_DIRS": True,
-    "OPTIONS": {"context_processors": [
-        "django.template.context_processors.request",
-        "django.contrib.auth.context_processors.auth",
-        "django.contrib.messages.context_processors.messages",
-    ]},
+    "OPTIONS": {
+        "context_processors": [
+            "django.template.context_processors.request",
+            "django.contrib.auth.context_processors.auth",
+            "django.contrib.messages.context_processors.messages",
+            "enroll.context_processors.user_role",
+        ]
+    }
 }]
+
 WSGI_APPLICATION = "pdc.wsgi.application"
 ASGI_APPLICATION = "pdc.asgi.application"
 DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}}
