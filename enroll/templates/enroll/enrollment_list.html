@@ -1,0 +1,54 @@
+{% extends 'enroll/index.html' %}
+
+{% block contents %}
+
+<div class="panel">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+
+        <h2>📝 Enrollment Management</h2>
+
+        <a class="primary"
+           href="{% url 'add_enrollment' %}">
+            ➕ Add Enrollment
+        </a>
+
+    </div>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Course</th>
+                <th>Enrollment Date</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for enrollment in enrollments %}
+
+            <tr>
+                <td>{{ enrollment.student }}</td>
+                <td>{{ enrollment.course }}</td>
+                <td>{{ enrollment.enrolled_at }}</td>
+            </tr>
+
+            {% empty %}
+
+            <tr>
+                <td colspan="3">
+                    No enrollments found.
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

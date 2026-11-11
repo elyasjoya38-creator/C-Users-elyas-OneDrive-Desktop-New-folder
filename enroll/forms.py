@@ -1,5 +1,15 @@
 from django import forms
-from .models import pdc_detials
+from .models import pdc_detials, Student, Teacher, Course
+from .models import (
+    pdc_detials,
+    Student,
+    Teacher,
+    Course,
+    Enrollment,
+    Attendance,
+    Certificate
+)
+
 
 class addpdcform(forms.ModelForm):
     class Meta:
@@ -21,3 +31,53 @@ class addpdcform(forms.ModelForm):
         if start and end and end < start:
             self.add_error("enddate", "End date cannot be earlier than start date.")
         return cleaned
+
+    
+class StudentForm(forms.ModelForm):
+
+    class Meta:
+        model = Student
+        fields = "__all__"
+
+
+class TeacherForm(forms.ModelForm):
+
+    class Meta:
+        model = Teacher
+        fields = "__all__"
+
+
+class CourseForm(forms.ModelForm):
+
+    class Meta:
+        model = Course
+        fields = "__all__"
+
+class EnrollmentForm(forms.ModelForm):
+
+    class Meta:
+        model = Enrollment
+        fields = "__all__"
+
+
+class EnrollmentForm(forms.ModelForm):
+
+    class Meta:
+        model = Enrollment
+        fields = "__all__"
+
+        
+class AttendanceForm(forms.ModelForm):
+
+    class Meta:
+        model = Attendance
+        fields = "__all__"
+
+
+class CertificateForm(forms.ModelForm):
+
+    class Meta:
+        model = Certificate
+        fields = "__all__"
+
+

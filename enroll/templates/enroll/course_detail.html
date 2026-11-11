@@ -1,0 +1,41 @@
+{% extends 'enroll/index.html' %}
+
+{% block contents %}
+
+<div class="panel">
+
+    <h2>📚 Course Details</h2>
+
+    <p>
+        <strong>Course Name:</strong>
+        {{ course.course_name }}
+    </p>
+
+    <p>
+        <strong>Teacher:</strong>
+        {{ course.teacher }}
+    </p>
+
+    <p>
+        <strong>Start Date:</strong>
+        {{ course.start_date }}
+    </p>
+
+    <p>
+        <strong>End Date:</strong>
+        {{ course.end_date }}
+    </p>
+
+    <p>
+        <strong>Description:</strong>
+        {{ course.description }}
+    </p>
+
+    <a class="primary"
+       href="{% url 'course_list' %}">
+       ← Back
+    </a>
+
+</div>
+
+{% endblock %}

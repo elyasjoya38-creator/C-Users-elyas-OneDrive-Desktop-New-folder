@@ -1,0 +1,60 @@
+{% extends 'enroll/index.html' %}
+
+{% block contents %}
+
+<div class="panel">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+
+        <h2>📄 Certificates Management</h2>
+
+        <a class="primary"
+           href="{% url 'add_certificate' %}">
+            ➕ Add Certificate
+        </a>
+
+    </div>
+
+    <div class="tablewrap">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Certificate No</th>
+                    <th>Student</th>
+                    <th>Course</th>
+                    <th>Issue Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for certificate in certificates %}
+
+                <tr>
+                    <td>{{ certificate.certificate_no }}</td>
+                    <td>{{ certificate.student }}</td>
+                    <td>{{ certificate.course }}</td>
+                    <td>{{ certificate.issue_date }}</td>
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="4">
+                        No certificates found.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

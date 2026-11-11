@@ -78,17 +78,128 @@
         }
     </style>
 </head>
+
+<footer
+style="
+text-align:center;
+padding:20px;
+color:#64748b;
+">
+
+© 2026 Ghargistan University
+PDC Management System
+
+</footer>
+
 <body>
+   
     <aside class="sidebar">
         <div class="brand">
             <img src="{% static 'enroll/images/LOGO-GHU.png' %}" alt="Ghargistan University logo">
             <span>Ghargistan University<br>PDC System</span>
         </div>
-        <nav class="nav" aria-label="Main navigation">
-            <a class="{% if active_page == 'home' %}active{% endif %}" href="{% url 'home' %}">Dashboard</a>
-            <a class="{% if active_page == 'addpdc' %}active{% endif %}" href="{% url 'addpdc' %}">Add PDC</a>
-            <a class="{% if active_page == 'managepdc' %}active{% endif %}" href="{% url 'managepdc' %}">Manage PDC</a>
-        </nav>
+        
+    <nav class="nav" aria-label="Main navigation">
+
+{% for group in request.user.groups.all %}
+
+{% if group.name == "Admin" %}
+
+<a class="{% if active_page == 'home' %}active{% endif %}"
+   href="{% url 'home' %}">
+   🏠 Dashboard
+</a>
+
+<a class="{% if active_page == 'students' %}active{% endif %}"
+   href="{% url 'student_list' %}">
+   👨‍🎓 Students
+</a>
+
+<a class="{% if active_page == 'teachers' %}active{% endif %}"
+   href="{% url 'teacher_list' %}">
+   👨‍🏫 Teachers
+</a>
+
+<a class="{% if active_page == 'courses' %}active{% endif %}"
+   href="{% url 'course_list' %}">
+   📚 Courses
+</a>
+
+<a class="{% if active_page == 'enrollment' %}active{% endif %}"
+   href="{% url 'enrollment_list' %}">
+   📝 Enrollment
+</a>
+
+<a href="{% url 'attendance_list' %}">
+   ✅ Attendance
+</a>
+
+<a class="{% if active_page == 'certificate' %}active{% endif %}"
+   href="{% url 'certificate_list' %}">
+   📄 Certificates
+</a>
+
+<a class="{% if active_page == 'reports' %}active{% endif %}"
+   href="{% url 'reports' %}">
+   📊 Reports
+</a>
+
+<a class="{% if active_page == 'addpdc' %}active{% endif %}"
+   href="{% url 'addpdc' %}">
+   ➕ Add PDC
+</a>
+
+<a class="{% if active_page == 'managepdc' %}active{% endif %}"
+   href="{% url 'managepdc' %}">
+   📋 Manage PDC
+</a>
+
+{% endif %}
+
+{% if group.name == "Teacher" %}
+
+<a href="{% url 'home' %}">
+   🏠 Dashboard
+</a>
+
+<a href="{% url 'course_list' %}">
+   📚 My Courses
+</a>
+
+<a href="{% url 'attendance_list' %}">
+   ✅ Attendance
+</a>
+
+{% endif %}
+
+{% if group.name == "Student" %}
+
+<a href="{% url 'home' %}">
+   🏠 Dashboard
+</a>
+
+<a href="#">
+   👤 My Profile
+</a>
+
+<a href="#">
+   📚 My Courses
+</a>
+
+<a href="#">
+   ✅ My Attendance
+</a>
+
+<a href="#">
+   📄 My Certificates
+</a>
+
+{% endif %}
+
+{% endfor %}
+
+</nav>
+
     </aside>
 
     <div class="main">
@@ -108,8 +219,13 @@
         {% block contents %}
         <main class="content">
             <section class="hero">
-                <h1>PDC Dashboard</h1>
-                <p>Manage professional development activities in one place.</p>
+             <h1>
+🎓 Ghargistan University
+</h1>
+
+<p>
+Professional Development Center Management System
+</p>
             </section>
 
             {% if messages %}
@@ -118,12 +234,46 @@
                 {% endfor %}
             {% endif %}
 
-            <section class="stats" aria-label="PDC statistics">
-                <div class="stat"><span>Total PDC Records</span><strong>{{ total_pdcs|default:0 }}</strong></div>
-                <div class="stat"><span>Seminars</span><strong>{{ seminar_count|default:0 }}</strong></div>
-                <div class="stat"><span>Workshops</span><strong>{{ workshop_count|default:0 }}</strong></div>
-                <div class="stat"><span>Upcoming PDCs</span><strong>{{ upcoming_pdcs|default:0 }}</strong></div>
-            </section>
+           <section class="stats">
+
+
+<div class="stat">
+    <span>👨‍🎓 Students</span>
+    <strong>{{ total_students }}</strong>
+</div>
+
+
+    <div class="stat">
+        <span>👨‍🏫 Teachers</span>
+        <strong>{{ total_teachers }}</strong>
+    </div>
+
+    <div class="stat">
+        <span>📚 Courses</span>
+        <strong>{{ total_courses }}</strong>
+    </div>
+
+    <div class="stat">
+        <span>📝 Enrollments</span>
+        <strong>{{ total_enrollments }}</strong>
+    </div>
+
+    <div class="stat">
+        <span>✅ Attendance</span>
+        <strong>{{ total_attendance }}</strong>
+    </div>
+
+    <div class="stat">
+        <span>📄 Certificates</span>
+        <strong>{{ total_certificates }}</strong>
+    </div>
+
+    <div class="stat">
+        <span>📅 PDC Events</span>
+        <strong>{{ total_pdcs }}</strong>
+    </div>
+
+</section>
 
             <section class="panel">
                 <h2>Recently Added PDCs</h2>

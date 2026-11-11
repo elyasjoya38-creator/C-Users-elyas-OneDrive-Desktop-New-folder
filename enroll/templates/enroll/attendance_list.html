@@ -1,0 +1,56 @@
+{% extends 'enroll/index.html' %}
+
+{% block contents %}
+
+<div class="panel">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+
+        <h2>✅ Attendance Management</h2>
+
+        <a class="primary"
+           href="{% url 'add_attendance' %}">
+            ➕ Add Attendance
+        </a>
+
+    </div>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Course</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for item in attendance %}
+
+            <tr>
+                <td>{{ item.student }}</td>
+                <td>{{ item.course }}</td>
+                <td>{{ item.date }}</td>
+                <td>{{ item.status }}</td>
+            </tr>
+
+            {% empty %}
+
+            <tr>
+                <td colspan="4">
+                    No attendance records found.
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

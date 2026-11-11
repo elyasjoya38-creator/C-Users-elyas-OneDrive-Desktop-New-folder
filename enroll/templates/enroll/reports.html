@@ -1,0 +1,152 @@
+{% extends 'enroll/index.html' %}
+
+{% block contents %}
+
+
+<div style="display:flex;gap:10px;margin-bottom:20px;">
+
+    <a class="primary"
+       href="{% url 'student_list' %}">
+       👨‍🎓 Students
+    </a>
+
+
+    <a class="primary"
+       href="{% url 'teacher_list' %}">
+       👨‍🏫 Teachers
+    </a>
+
+    <a class="primary"
+       href="{% url 'course_list' %}">
+       📚 Courses
+    </a>
+
+    <a class="primary"
+       href="{% url 'enrollment_list' %}">
+       📝 Enrollment
+    </a> 
+
+       <button onclick="window.print()">
+    🖨 Print Report
+</button>
+
+
+</div>
+
+ 
+<div class="panel">
+
+<h2>📊 Reports</h2>
+
+<div class="stats">
+
+    <div class="stat">
+        <span>Students</span>
+        <strong>{{ total_students }}</strong>
+    </div>
+
+    <div class="stat">
+        <span>Teachers</span>
+        <strong>{{ total_teachers }}</strong>
+    </div>
+
+    <div class="stat">
+        <span>Courses</span>
+        <strong>{{ total_courses }}</strong>
+    </div>
+
+    <div class="stat">
+        <span>Enrollments</span>
+        <strong>{{ total_enrollments }}</strong>
+    </div>
+
+    <div class="stat">
+        <span>Attendance</span>
+        <strong>{{ total_attendance }}</strong>
+    </div>
+
+    <div class="stat">
+        <span>Certificates</span>
+        <strong>{{ total_certificates }}</strong>
+    </div>
+
+    <div class="stat">
+        <span>PDC Events</span>
+        <strong>{{ total_pdcs }}</strong>
+    </div>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+    <h3>Quick Actions</h3>
+
+    <p>
+        <a class="primary"
+           href="{% url 'add_student' %}">
+            ➕ Add Student
+        </a>
+    </p>
+
+    <p>
+        <a class="primary"
+           href="{% url 'add_teacher' %}">
+            ➕ Add Teacher
+        </a>
+    </p>
+
+    <p>
+        <a class="primary"
+           href="{% url 'add_course' %}">
+            ➕ Add Course
+        </a>
+    </p>
+
+    <p>
+        <a class="primary"
+           href="{% url 'add_enrollment' %}">
+            ➕ Add Enrollment
+        </a>
+    </p>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<canvas id="myChart"></canvas>
+
+<script>
+
+const ctx = document.getElementById('myChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [
+            'Students',
+            'Teachers',
+            'Courses',
+            'Enrollments',
+            'Attendance'
+        ],
+        datasets: [{
+            label: 'University Statistics',
+            data: [
+                {{ total_students }},
+                {{ total_teachers }},
+                {{ total_courses }},
+                {{ total_enrollments }},
+                {{ total_attendance }}
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true
+    }
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,414 @@
+{% extends 'enroll/index.html' %}
+
+{% block contents %}
+
+<style>
+
+.student-page{
+    max-width:1500px;
+    margin:auto;
+    padding:25px;
+}
+
+.student-hero{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:20px;
+    padding:30px;
+    border-radius:18px;
+    background:linear-gradient(135deg,#1565c0,#42a5f5);
+    color:white;
+    margin-bottom:25px;
+    box-shadow:0 10px 30px rgba(21,101,192,.20);
+}
+
+.student-hero h2{
+    margin:0;
+    font-size:32px;
+}
+
+.student-hero p{
+    margin-top:8px;
+    opacity:.95;
+}
+
+.add-student-btn{
+    background:white;
+    color:#1565c0;
+    text-decoration:none;
+    padding:12px 18px;
+    border-radius:10px;
+    font-weight:700;
+}
+
+.add-student-btn:hover{
+    background:#f8fafc;
+}
+
+.student-stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:25px;
+}
+
+.student-card{
+    background:white;
+    padding:22px;
+    border-radius:16px;
+    box-shadow:0 5px 20px rgba(0,0,0,.06);
+    transition:.3s;
+}
+
+.student-card:hover{
+    transform:translateY(-4px);
+}
+
+.student-card:nth-child(1){
+    border-left:5px solid #2563eb;
+}
+
+.student-card:nth-child(2){
+    border-left:5px solid #10b981;
+}
+
+.student-card:nth-child(3){
+    border-left:5px solid #f59e0b;
+}
+
+.student-card:nth-child(4){
+    border-left:5px solid #ef4444;
+}
+
+.student-card span{
+    display:block;
+    color:#64748b;
+    margin-bottom:8px;
+}
+
+.student-card strong{
+    font-size:28px;
+}
+
+.student-panel{
+    background:white;
+    border-radius:18px;
+    padding:24px;
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+}
+
+.student-toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.student-search{
+    width:100%;
+    max-width:450px;
+    height:48px;
+    border:1px solid #dbeafe;
+    border-radius:12px;
+    padding:0 15px;
+    font-size:14px;
+}
+
+.student-table-wrap{
+    overflow-x:auto;
+}
+
+.student-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.student-table thead th{
+    background:#eff6ff;
+    padding:16px;
+    text-align:left;
+    font-size:13px;
+    color:#475569;
+}
+
+.student-table td{
+    padding:16px;
+    border-bottom:1px solid #e2e8f0;
+}
+
+.student-table tbody tr{
+    transition:.2s;
+}
+
+.student-table tbody tr:hover{
+    background:#f8fafc;
+}
+
+.student-avatar{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #dbeafe;
+}
+
+.student-name{
+    text-decoration:none;
+    color:#1565c0;
+    font-weight:600;
+}
+
+.student-name:hover{
+    text-decoration:underline;
+}
+
+.action-buttons{
+    display:flex;
+    gap:8px;
+}
+
+.btn-edit{
+    text-decoration:none;
+    background:#fef3c7;
+    color:#d97706;
+    padding:8px 12px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.btn-edit:hover{
+    background:#d97706;
+    color:white;
+}
+
+.btn-delete{
+    text-decoration:none;
+    background:#fee2e2;
+    color:#dc2626;
+    padding:8px 12px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.btn-delete:hover{
+    background:#dc2626;
+    color:white;
+}
+
+.empty-state{
+    text-align:center;
+    padding:40px;
+    color:#64748b;
+}
+
+@media(max-width:900px){
+
+    .student-stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:700px){
+
+    .student-stats{
+        grid-template-columns:1fr;
+    }
+
+    .student-hero{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+}
+
+</style>
+
+<div class="student-page">
+
+    <div class="student-hero">
+
+        <div>
+
+            <h2>👨‍🎓 Students Management</h2>
+
+            <p>
+                Manage all student records of Ghargistan University
+            </p>
+
+        </div>
+
+        <a href="{% url 'add_student' %}"
+           class="add-student-btn">
+
+            ➕ Add Student
+
+        </a>
+
+    </div>
+
+    <div class="student-stats">
+
+        <div class="student-card">
+            <span>Total Students</span>
+            <strong>{{ students|length }}</strong>
+        </div>
+
+        <div class="student-card">
+            <span>Status</span>
+            <strong>Active</strong>
+        </div>
+
+        <div class="student-card">
+            <span>Faculty Records</span>
+            <strong>Available</strong>
+        </div>
+
+        <div class="student-card">
+            <span>Management</span>
+            <strong>Professional</strong>
+        </div>
+
+    </div>
+
+    <div class="student-panel">
+
+        <div class="student-toolbar">
+
+            <h3>Student Records</h3>
+
+            <form method="GET">
+
+                <input
+                    type="text"
+                    name="search"
+                    placeholder="🔍 Search Student..."
+                    value="{{ request.GET.search }}"
+                    class="student-search">
+
+            </form>
+
+        </div>
+
+        <div class="student-table-wrap">
+
+            <table class="student-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Photo</th>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Faculty</th>
+                        <th>Department</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for student in students %}
+
+                    <tr>
+
+                        <td>
+
+                            {% if student.photo %}
+
+                            <img
+                                src="{{ student.photo.url }}"
+                                class="student-avatar">
+
+                            {% else %}
+
+                            👤
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>{{ student.student_id }}</td>
+
+                        <td>
+                            <a href="{% url 'student_detail' student.id %}"
+                               class="student-name">
+
+                               {{ student.full_name }}
+
+                            </a>
+                        </td>
+
+                        <td>{{ student.faculty }}</td>
+
+                        <td>{{ student.department }}</td>
+
+                        <td>{{ student.email }}</td>
+
+                        <td>{{ student.phone }}</td>
+
+                        <td>
+
+                            <div class="action-buttons">
+
+                                <a
+                                    href="{% url 'edit_student' student.id %}"
+                                    class="btn-edit">
+
+                                    ✏ Edit
+
+                                </a>
+
+                                <a
+                                    href="{% url 'delete_student' student.id %}"
+                                    class="btn-delete">
+
+                                    🗑 Delete
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="8"
+                            class="empty-state">
+
+                            No students found
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

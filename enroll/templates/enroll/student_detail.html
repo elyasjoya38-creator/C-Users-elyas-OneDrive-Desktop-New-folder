@@ -1,0 +1,50 @@
+{% extends 'enroll/index.html' %}
+
+{% block contents %}
+
+<div class="panel">
+
+    <h2>👨‍🎓 Student Profile</h2>
+
+    <hr>
+
+    <p>
+        <strong>Student ID:</strong>
+        {{ student.student_id }}
+    </p>
+
+    <p>
+        <strong>Full Name:</strong>
+        {{ student.full_name }}
+    </p>
+
+    <p>
+        <strong>Faculty:</strong>
+        {{ student.faculty }}
+    </p>
+
+    <p>
+        <strong>Department:</strong>
+        {{ student.department }}
+    </p>
+
+    <p>
+        <strong>Email:</strong>
+        {{ student.email }}
+    </p>
+
+    <p>
+        <strong>Phone:</strong>
+        {{ student.phone }}
+    </p>
+
+    <br>
+
+    <a class="primary"
+       href="{% url 'student_list' %}">
+       ← Back
+    </a>
+
+</div>
+
+{% endblock %}

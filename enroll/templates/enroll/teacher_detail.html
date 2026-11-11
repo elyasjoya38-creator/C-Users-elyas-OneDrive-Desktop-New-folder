@@ -1,0 +1,40 @@
+{% extends 'enroll/index.html' %}
+
+{% block contents %}
+
+<div class="panel">
+
+    <h2>👨‍🏫 Teacher Profile</h2>
+
+    <hr>
+
+    <p>
+        <strong>Name:</strong>
+        {{ teacher.full_name }}
+    </p>
+
+    <p>
+        <strong>Specialization:</strong>
+        {{ teacher.specialization }}
+    </p>
+
+    <p>
+        <strong>Email:</strong>
+        {{ teacher.email }}
+    </p>
+
+    <p>
+        <strong>Phone:</strong>
+        {{ teacher.phone }}
+    </p>
+
+    <br>
+
+    <a class="primary"
+       href="{% url 'teacher_list' %}">
+       ← Back
+    </a>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'enroll/index.html' %}
+
+{% block contents %}
+
+<div class="panel">
+
+    <h2>➕ Add Enrollment</h2>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button class="primary" type="submit">
+            Save Enrollment
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}
