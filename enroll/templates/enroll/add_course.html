@@ -1,23 +1,5 @@
 {% extends 'enroll/index.html' %}
 
 {% block contents %}
-
-<div class="panel">
-
-<h2>➕ Add Course</h2>
-
-<form method="POST">
-
-{% csrf_token %}
-
-{{ form.as_p }}
-
-<button class="primary" type="submit">
-Save Course
-</button>
-
-</form>
-
-</div>
-
-{% endblock %}
+{% include 'enroll/_record_form.html' with page_title='Add Course' page_description='Create a new academic course and assign it to a teacher.' page_icon='📚' submit_label='Save Course' cancel_url='/courses/' %}
+{% endblock contents %}

@@ -6,42 +6,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ghargistan University | PDC Login</title>
     <style>
-        * { box-sizing: border-box; font-family: Arial, sans-serif; }
+        * { box-sizing: border-box; }
         body {
-            min-height: 100vh; margin: 0; padding: 22px; display: flex;
-            align-items: center; justify-content: center;
-            background: radial-gradient(circle at top left, #42a5f5 0, transparent 38%),
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 22px;
+            background: radial-gradient(circle at top left, rgba(66, 165, 245, .5), transparent 35%),
                         linear-gradient(135deg, #1565c0, #0d2e68);
+            font-family: Arial, sans-serif;
         }
         .login-card {
-            width: 100%; max-width: 420px; padding: 34px;
-            border: 1px solid #ffffff80; border-radius: 20px;
-            background: #fff; box-shadow: 0 20px 55px #061b3c40;
+            width: min(100%, 450px);
+            padding: 34px 30px 28px;
+            border: 1px solid rgba(255,255,255,.3);
+            border-radius: 22px;
+            background: #fff;
+            box-shadow: 0 22px 60px rgba(4, 26, 60, .30);
         }
-        .logo { display: flex; justify-content: center; margin-bottom: 12px; }
+        .logo { display: flex; justify-content: center; margin-bottom: 10px; }
         .logo img { width: 88px; height: 88px; object-fit: contain; }
-        .system-name { margin: 0; color: #0d47a1; font-size: 25px; font-weight: 800; text-align: center; letter-spacing: .04em; }
-        .welcome { margin: 12px 0 7px; color: #1e293b; text-align: center; font-size: 22px; }
-        .subtitle { margin: 0 0 25px; color: #64748b; text-align: center; line-height: 1.5; font-size: 14px; }
-        .field { margin-bottom: 17px; }
-        .field label { display: block; margin-bottom: 7px; color: #334155; font-size: 14px; font-weight: 700; }
+        .system-name { margin: 0; color: #0d47a1; font-size: 24px; text-align: center; letter-spacing: .08em; font-weight: 800; }
+        .welcome { margin: 14px 0 8px; color: #1e293b; font-size: 24px; text-align: center; }
+        .subtitle { margin: 0 0 22px; color: #64748b; font-size: 14px; line-height: 1.5; text-align: center; }
+        .field { margin-bottom: 18px; }
+        .field label {
+            display: block;
+            margin-bottom: 7px;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 700;
+        }
         .field input {
-            display: block; width: 100%; padding: 13px 14px; border: 1px solid #cbd5e1;
-            border-radius: 9px; background: #fff; color: #1e293b; font-size: 15px; outline: none;
+            display: block;
+            width: 100%;
+            min-height: 46px;
+            padding: 11px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            background: #fff;
+            color: #1e293b;
+            font-size: 15px;
+            outline: none;
         }
-        .field input:focus { border-color: #1565c0; box-shadow: 0 0 0 3px #1565c01c; }
+        .field input:focus {
+            border-color: #1565c0;
+            box-shadow: 0 0 0 3px rgba(21,101,192,.12);
+        }
         .btn {
-            width: 100%; margin-top: 4px; padding: 13px; border: 0; border-radius: 9px;
-            background: #1565c0; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
-            transition: background .15s, transform .15s;
+            width: 100%;
+            min-height: 46px;
+            margin-top: 8px;
+            border: 0;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #1565c0, #42a5f5);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .15s ease, filter .15s ease;
         }
-        .btn:hover { background: #0d47a1; }
+        .btn:hover { filter: brightness(1.03); }
         .btn:active { transform: translateY(1px); }
-        .message { margin-bottom: 12px; padding: 11px 12px; border-radius: 8px; background: #fde8e8; color: #991b1b; font-size: 14px; line-height: 1.45; }
-        .message.success { background: #e8f8ee; color: #166534; }
-        .message.warning { background: #fff7db; color: #854d0e; }
-        .foot { margin-top: 23px; color: #94a3b8; font-size: 12px; text-align: center; line-height: 1.5; }
-        @media (max-width: 480px) { .login-card { padding: 27px 21px; } .system-name { font-size: 23px; } }
+        .message {
+            margin-bottom: 12px;
+            padding: 11px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .message.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .message.success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .message.warning { background: #fff7db; color: #854d0e; border: 1px solid #fde68a; }
+        .link-row {
+            margin-top: 18px;
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+        }
+        .link-row a { color: #1565c0; font-weight: 700; text-decoration: none; }
+        .foot {
+            margin-top: 22px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+        @media (max-width: 480px) {
+            .login-card { padding: 26px 20px 22px; }
+            .system-name { letter-spacing: .04em; }
+        }
     </style>
 </head>
 <body>
@@ -51,7 +106,7 @@
         </div>
         <h1 class="system-name">PDC SYSTEM</h1>
         <h2 class="welcome">Welcome Back</h2>
-        <p class="subtitle">Sign in to Ghargistan University PDC System</p>
+        <p class="subtitle">Sign in to the Ghargistan University PDC System</p>
 
         {% if messages %}
             {% for message in messages %}
@@ -80,9 +135,10 @@
             <button class="btn" type="submit">Sign In</button>
         </form>
 
-        <p style="text-align:center;margin:18px 0 0;color:#64748b;font-size:14px">
-            
-        </p>
+        <div class="link-row">
+            Need an account? <a href="{% url 'register' %}">Create one</a>
+        </div>
+
         <div class="foot">&copy; Ghargistan University · PDC Management System</div>
     </main>
 </body>
