@@ -65,13 +65,22 @@
             outline: none;
         }
         .helptext,
-        .errorlist {
+        .errorlist,
+        .message {
             margin: 6px 0 0;
             color: #64748b;
             font-size: 12px;
             line-height: 1.6;
         }
         .errorlist { color: #b91c1c; }
+        .message {
+            margin-bottom: 12px;
+            padding: 11px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        .message.success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .message.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
         button {
             width: 100%;
             min-height: 46px;
@@ -100,6 +109,12 @@
         </div>
         <h1>Create User Account</h1>
         <p class="lead">Register as a PDC participant. New accounts receive standard user access.</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {{ message.tags }}" role="status">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
 
         <form method="post">
             {% csrf_token %}
