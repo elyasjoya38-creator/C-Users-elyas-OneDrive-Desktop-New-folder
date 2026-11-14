@@ -1,92 +1,44 @@
+{% load static %}
 {% extends 'enroll/index.html' %}
 
 {% block contents %}
+<link rel="stylesheet" href="{% static 'enroll/css/forms.css' %}">
+<section class="directory-page">
+    <header class="directory-heading">
+        <div>
+            <p class="record-form-kicker">Ghargistan University · PDC</p>
+            <h1>Teachers</h1>
+            <p>Find and manage teacher records.</p>
+        </div>
+        <a class="form-button form-button-primary" href="{% url 'add_teacher' %}">＋ Register Teacher</a>
+    </header>
 
-<form method="GET">
-
-    <input
-        type="text"
-        name="search"
-        placeholder="Search Teacher..."
-    >
-
-    <button type="submit">
-        Search
-    </button>
-
-</form>
-
-<div class="panel">
-
-<div style="display:flex;justify-content:space-between;margin-bottom:20px;">
-
-<h2>👨‍🏫 Teachers Management</h2>
-
-<a class="primary"
-href="{% url 'add_teacher' %}">
-➕ Add Teacher
-</a>
-
-</div>
-
-<table>
-
-<thead>
-<tr>
-<th>Name</th>
-<th>Specialization</th>
-<th>Email</th>
-<th>Phone</th>
-</tr>
-</thead>
-
-<tbody>
-
-{% for teacher in teachers %}
-
-<tr>
-
-    <td>
-
-<a href="{% url 'teacher_detail' teacher.id %}">
-    {{ teacher.full_name }}
-</a>
-
-</td>
-    <td>{{ teacher.specialization }}</td>
-    <td>{{ teacher.email }}</td>
-    <td>{{ teacher.phone }}</td>
-
-    <td>
-
-        <a href="{% url 'edit_teacher' teacher.id %}">
-            ✏ Edit
-        </a>
-
-        |
-
-        <a href="{% url 'delete_teacher' teacher.id %}">
-            🗑 Delete
-        </a>
-
-    </td>
-
-</tr>
-
-{% empty %}
-
-<tr>
-    <td colspan="5">
-        No teachers found.
-    </td>
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-</div>
-
-{% endblock %}
+    <div class="directory-card">
+        {% if messages %}{% for message in messages %}<div class="form-message {{ message.tags }}" role="status">{{ message }}</div>{% endfor %}{% endif %}
+        <form class="directory-search" method="get" role="search">
+            <label class="visually-hidden" for="teacher-search">Search teachers</label>
+            <input id="teacher-search" name="search" type="search" value="{{ search }}" placeholder="Search by name, specialization or email">
+            <button class="form-button form-button-secondary" type="submit">Search</button>
+            {% if search %}<a class="clear-search" href="{% url 'teacher_list' %}">Clear</a>{% endif %}
+        </form>
+        <div class="directory-table-wrap">
+            <table class="directory-table">
+                <thead><tr><th>Full name</th><th>Specialization</th><th>Email</th><th>Phone</th><th>Actions</th></tr></thead>
+                <tbody>
+                    {% for teacher in teachers %}
+                    <tr>
+                        <td><a class="directory-name" href="{% url 'teacher_detail' teacher.id %}">{{ teacher.full_name }}</a></td>
+                        <td>{{ teacher.specialization }}</td><td>{{ teacher.email }}</td><td>{{ teacher.phone }}</td>
+                        <td><div class="directory-actions">
+                            <a class="table-action" href="{% url 'edit_teacher' teacher.id %}">Edit</a>
+                            <form method="post" action="{% url 'delete_teacher' teacher.id %}" onsubmit="return confirm('Delete this teacher record?');">{% csrf_token %}<button class="table-action table-action-danger" type="submit">Delete</button></form>
+                        </div></td>
+                    </tr>
+                    {% empty %}<tr><td class="directory-empty" colspan="5">{% if search %}No teachers match “{{ search }}”.{% else %}No teachers registered yet. Use “Register Teacher” to add the first record.{% endif %}</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="directory-count">{{ teachers|length }} record{{ teachers|length|pluralize }}</p>
+    </div>
+</section>
+{% endblock contents %}

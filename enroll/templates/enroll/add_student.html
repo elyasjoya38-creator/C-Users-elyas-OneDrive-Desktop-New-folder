@@ -1,18 +1,5 @@
 {% extends 'enroll/index.html' %}
 
 {% block contents %}
-
-<div class="panel">
-    <h2>Add Student</h2>
-
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-
-        <button class="primary" type="submit">
-            Add Student
-        </button>
-    </form>
-</div>
-
-{% endblock %}
+{% include 'enroll/_record_form.html' with page_title='Register Student' page_description='Enter the student’s academic and contact details.' page_icon='🎓' submit_label='Save Student' cancel_url='/students/' %}
+{% endblock contents %}

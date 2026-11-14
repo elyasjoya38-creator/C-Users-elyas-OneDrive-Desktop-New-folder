@@ -1,0 +1,40 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'enroll/css/forms.css' %}">
+<section class="record-form-page">
+    <header class="record-form-heading">
+        <div>
+            <p class="record-form-kicker">Ghargistan University · PDC</p>
+            <h1>{{ page_title }}</h1>
+            <p>{{ page_description }}</p>
+        </div>
+        <span class="record-form-icon" aria-hidden="true">{{ page_icon }}</span>
+    </header>
+
+    <div class="record-form-card">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="form-message {{ message.tags }}" role="status">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <form method="post" class="record-form" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="form-errors" role="alert">{{ form.non_field_errors }}</div>
+            {% endif %}
+            <div class="record-form-grid">
+                {% for field in form %}
+                    <div class="form-field{% if field.name == 'description' or field.name == 'descript' %} form-field-wide{% endif %}">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}<small class="field-help">{{ field.help_text }}</small>{% endif %}
+                        {% if field.errors %}<div class="field-errors" role="alert">{{ field.errors }}</div>{% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="record-form-actions">
+                <button class="form-button form-button-primary" type="submit">{{ submit_label }}</button>
+                <a class="form-button form-button-secondary" href="{{ cancel_url }}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>

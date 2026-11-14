@@ -1,20 +1,5 @@
 {% extends 'enroll/index.html' %}
 
 {% block contents %}
-
-<div class="panel">
-
-    <h2>✏ Edit Teacher</h2>
-
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-
-        <button class="primary" type="submit">
-            Update Teacher
-        </button>
-    </form>
-
-</div>
-
-{% endblock %}
+{% include 'enroll/_record_form.html' with page_title='Edit Teacher' page_description='Update the teacher’s professional and contact details.' page_icon='👩‍🏫' submit_label='Save Changes' cancel_url='/teachers/' %}
+{% endblock contents %}
