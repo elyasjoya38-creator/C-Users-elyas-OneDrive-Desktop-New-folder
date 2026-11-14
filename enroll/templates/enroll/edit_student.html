@@ -1,5 +1,6 @@
 {% extends 'enroll/index.html' %}
 
 {% block contents %}
-{% include 'enroll/_record_form.html' with page_title='Edit Student' page_description='Update the student’s academic and contact details.' page_icon='🎓' submit_label='Save Changes' cancel_url='/students/' %}
+{% url 'student_list' as cancel_url %}
+{% include 'enroll/_record_form.html' with page_title='Edit Student' page_description='Update the student’s academic and contact details.' page_icon='🎓' submit_label='Save Changes' cancel_url=cancel_url %}
 {% endblock contents %}
