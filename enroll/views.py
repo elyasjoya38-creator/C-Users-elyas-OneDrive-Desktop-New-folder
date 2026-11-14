@@ -25,11 +25,12 @@ def is_pdc_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
 
-admin_required = user_passes_test(is_pdc_admin, login_url="user_dashboard")
-
-
 def is_admin(user):
+    """Backward-compatible alias for the institutional admin check."""
     return is_pdc_admin(user)
+
+
+admin_required = user_passes_test(is_pdc_admin, login_url="user_dashboard")
 
 
 def is_teacher(user):
