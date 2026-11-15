@@ -1,23 +1,7 @@
 {% extends 'enroll/index.html' %}
-
+{% load static %}
 {% block contents %}
-
-<div class="panel">
-
-    <h2>➕ Add Enrollment</h2>
-
-    <form method="POST">
-
-        {% csrf_token %}
-
-        {{ form.as_p }}
-
-        <button class="primary" type="submit">
-            Save Enrollment
-        </button>
-
-    </form>
-
-</div>
-
-{% endblock %}
+<link rel="stylesheet" href="{% static 'enroll/css/forms.css' %}">
+{% url 'enrollment_list' as cancel_url %}
+{% include 'enroll/_record_form.html' with page_title='Add Enrollment' page_description='Register a student in a course. New admin-created records are approved immediately.' page_icon='📝' submit_label='Save Enrollment' cancel_url=cancel_url %}
+{% endblock contents %}

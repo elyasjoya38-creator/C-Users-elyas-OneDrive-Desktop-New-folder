@@ -1,30 +1,14 @@
+{% load static %}
 {% extends 'enroll/index.html' %}
 
 {% block contents %}
-
-<div class="panel">
-
-    <h2>🗑 Delete Student</h2>
-
-    <p>
-        Are you sure you want to delete
-        <strong>{{ student.full_name }}</strong> ?
-    </p>
-
-    <form method="POST">
-
-        {% csrf_token %}
-
-        <button class="primary" type="submit">
-            Yes, Delete
-        </button>
-
-        <a href="{% url 'student_list' %}">
-            Cancel
-        </a>
-
-    </form>
-
-</div>
-
-{% endblock %}
+<link rel="stylesheet" href="{% static 'enroll/css/forms.css' %}">
+<section class="directory-page confirm-page">
+    <div class="directory-card confirm-card">
+        <span class="confirm-icon" aria-hidden="true">⚠️</span>
+        <h1>Delete student?</h1>
+        <p>This will permanently delete <strong>{{ student.full_name }}</strong> ({{ student.student_id }}). Related enrollments, attendance, and certificates may also be removed.</p>
+        <form method="post" class="record-form-actions">{% csrf_token %}<button class="form-button form-button-danger" type="submit">Yes, delete student</button><a class="form-button form-button-secondary" href="{% url 'student_list' %}">Cancel</a></form>
+    </div>
+</section>
+{% endblock contents %}

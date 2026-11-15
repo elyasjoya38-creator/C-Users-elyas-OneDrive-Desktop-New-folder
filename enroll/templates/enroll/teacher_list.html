@@ -1,92 +1,46 @@
 {% extends 'enroll/index.html' %}
-
+{% load static %}
+{% block title %}استادان | پورتال PDC{% endblock %}
 {% block contents %}
+<link rel="stylesheet" href="{% static 'enroll/css/forms.css' %}">
+<section class="directory-page">
+    <header class="directory-heading">
+        <div>
+            <p class="record-form-kicker">Ghargistan University · PDC</p>
+            <h1>استادان</h1>
+            <p>پروفایل استاد و وضعیت حساب ورود را مدیریت کنید.</p>
+        </div>
+        <a class="form-button form-button-primary" href="{% url 'add_teacher' %}">＋ ثبت استاد و حساب ورود</a>
+    </header>
 
-<form method="GET">
-
-    <input
-        type="text"
-        name="search"
-        placeholder="Search Teacher..."
-    >
-
-    <button type="submit">
-        Search
-    </button>
-
-</form>
-
-<div class="panel">
-
-<div style="display:flex;justify-content:space-between;margin-bottom:20px;">
-
-<h2>👨‍🏫 Teachers Management</h2>
-
-<a class="primary"
-href="{% url 'add_teacher' %}">
-➕ Add Teacher
-</a>
-
-</div>
-
-<table>
-
-<thead>
-<tr>
-<th>Name</th>
-<th>Specialization</th>
-<th>Email</th>
-<th>Phone</th>
-</tr>
-</thead>
-
-<tbody>
-
-{% for teacher in teachers %}
-
-<tr>
-
-    <td>
-
-<a href="{% url 'teacher_detail' teacher.id %}">
-    {{ teacher.full_name }}
-</a>
-
-</td>
-    <td>{{ teacher.specialization }}</td>
-    <td>{{ teacher.email }}</td>
-    <td>{{ teacher.phone }}</td>
-
-    <td>
-
-        <a href="{% url 'edit_teacher' teacher.id %}">
-            ✏ Edit
-        </a>
-
-        |
-
-        <a href="{% url 'delete_teacher' teacher.id %}">
-            🗑 Delete
-        </a>
-
-    </td>
-
-</tr>
-
-{% empty %}
-
-<tr>
-    <td colspan="5">
-        No teachers found.
-    </td>
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-</div>
-
-{% endblock %}
+    <div class="directory-card">
+        {% if messages %}{% for message in messages %}<div class="form-message {{ message.tags }}" role="status">{{ message }}</div>{% endfor %}{% endif %}
+        <form class="directory-search" method="get" role="search">
+            <label class="visually-hidden" for="teacher-search">جستجوی استادان</label>
+            <input id="teacher-search" name="search" type="search" value="{{ search }}" placeholder="جستجو بر اساس نام، تخصص یا ایمیل">
+            <button class="form-button form-button-secondary" type="submit">جستجو</button>
+            {% if search %}<a class="clear-search" href="{% url 'teacher_list' %}">پاک‌کردن</a>{% endif %}
+        </form>
+        <div class="directory-table-wrap">
+            <table class="directory-table">
+                <thead><tr><th>نام کامل</th><th>تخصص</th><th>ایمیل</th><th>تلفن</th><th>حساب ورود</th><th>عملیات</th></tr></thead>
+                <tbody>
+                    {% for teacher in teachers %}
+                    <tr>
+                        <td><a class="directory-name" href="{% url 'teacher_detail' teacher.id %}">{{ teacher.full_name }}</a></td>
+                        <td>{{ teacher.specialization }}</td><td>{{ teacher.email }}</td><td>{{ teacher.phone }}</td>
+                        <td>{% if teacher.user %}<span class="status-badge approved">فعال · {{ teacher.user.get_username }}</span>{% else %}<span class="status-badge rejected">حساب وصل نیست</span>{% endif %}</td>
+                        <td><div class="directory-actions">
+                            <a class="table-action" href="{% url 'edit_teacher' teacher.id %}">ویرایش</a>
+                            <form method="post" action="{% url 'delete_teacher' teacher.id %}" onsubmit="return confirm('پروفایل این استاد حذف شود؟');">{% csrf_token %}<button class="table-action table-action-danger" type="submit">حذف</button></form>
+                        </div></td>
+                    </tr>
+                    {% empty %}<tr><td class="directory-empty" colspan="6">{% if search %}استادی با این مشخصات پیدا نشد.{% else %}هنوز استادی ثبت نشده است. برای ساخت پروفایل و حساب ورود، «ثبت استاد و حساب ورود» را انتخاب کنید.{% endif %}</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="directory-count">{{ teachers|length }} پروفایل استاد</p>
+        <p class="field-help">رمز موقت را به‌صورت امن به استاد بدهید. رمز در این صفحه نمایش داده یا ذخیرهٔ متنی نمی‌شود.</p>
+    </div>
+</section>
+{% endblock contents %}
