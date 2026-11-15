@@ -10,6 +10,8 @@ from .models import Attendance, Certificate, Course, Enrollment, PDCRegistration
 
 
 class StyledModelForm(forms.ModelForm):
+    """Apply the shared form-control style to every model form field."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
@@ -19,6 +21,8 @@ class StyledModelForm(forms.ModelForm):
 
 
 class StudentRegistrationForm(UserCreationForm):
+    """Create a student login linked to a record prepared by PDC staff."""
+
     student_id = forms.CharField(max_length=20, label="Student ID")
 
     class Meta(UserCreationForm.Meta):
@@ -55,7 +59,13 @@ class AddPDCForm(StyledModelForm):
     class Meta:
         model = pdc_detials
         fields = ["title", "producer", "descript", "types", "time", "startdate", "enddate", "location", "urls"]
-        widgets = {"descript": forms.Textarea(attrs={"rows": 4}), "time": forms.TimeInput(attrs={"type": "time"}), "startdate": forms.DateInput(attrs={"type": "date"}), "enddate": forms.DateInput(attrs={"type": "date"}), "urls": forms.URLInput(attrs={"placeholder": "https://example.com"})}
+        widgets = {
+            "descript": forms.Textarea(attrs={"rows": 4}),
+            "time": forms.TimeInput(attrs={"type": "time"}),
+            "startdate": forms.DateInput(attrs={"type": "date"}),
+            "enddate": forms.DateInput(attrs={"type": "date"}),
+            "urls": forms.URLInput(attrs={"placeholder": "https://example.com"}),
+        }
 
     def clean(self):
         cleaned_data = super().clean()
@@ -65,6 +75,7 @@ class AddPDCForm(StyledModelForm):
         return cleaned_data
 
 
+# Keep the original lowercase name available for existing imports.
 addpdcform = AddPDCForm
 
 
@@ -72,14 +83,25 @@ class StudentForm(StyledModelForm):
     class Meta:
         model = Student
         fields = ["student_id", "full_name", "faculty", "department", "email", "phone"]
-        labels = {"student_id": "Student ID", "full_name": "Full name", "faculty": "Faculty", "department": "Department", "email": "Email address", "phone": "Phone number"}
-        widgets = {"email": forms.EmailInput(attrs={"autocomplete": "email"}), "phone": forms.TextInput(attrs={"autocomplete": "tel", "inputmode": "tel"})}
+        labels = {
+            "student_id": "Student ID",
+            "full_name": "Full name",
+            "faculty": "Faculty",
+            "department": "Department",
+            "email": "Email address",
+            "phone": "Phone number",
+        }
+        widgets = {
+            "email": forms.EmailInput(attrs={"autocomplete": "email"}),
+            "phone": forms.TextInput(attrs={"autocomplete": "tel", "inputmode": "tel"}),
+        }
 
 
 class TeacherForm(StyledModelForm):
-    """Staff creates the teacher's login while creating their profile.
+    """Create a teacher profile and a linked, non-staff login account.
 
-    Editing an existing profile intentionally does not expose account credentials.
+    When editing a profile, account credentials are deliberately not exposed;
+    the existing one-to-one user link remains unchanged.
     """
 
     username = forms.CharField(label="Teacher login username", max_length=150)
@@ -90,14 +112,18 @@ class TeacherForm(StyledModelForm):
         model = Teacher
         fields = ["full_name", "specialization", "email", "phone"]
         labels = {"full_name": "Full name", "email": "Email address", "phone": "Phone number"}
-        widgets = {"email": forms.EmailInput(attrs={"autocomplete": "email"}), "phone": forms.TextInput(attrs={"autocomplete": "tel", "inputmode": "tel"})}
+        widgets = {
+            "email": forms.EmailInput(attrs={"autocomplete": "email"}),
+            "phone": forms.TextInput(attrs={"autocomplete": "tel", "inputmode": "tel"}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.creating_profile = self.instance.pk is None
         if self.creating_profile:
             User = get_user_model()
-            self.fields["username"].max_length = User._meta.get_field(User.USERNAME_FIELD).max_length
+            username_field = User._meta.get_field(User.USERNAME_FIELD)
+            self.fields["username"].max_length = username_field.max_length or 150
             self.fields["username"].widget.attrs["autocomplete"] = "username"
             self.fields["password1"].widget.attrs["autocomplete"] = "new-password"
             self.fields["password2"].widget.attrs["autocomplete"] = "new-password"
@@ -108,13 +134,12 @@ class TeacherForm(StyledModelForm):
             self.fields.pop("password2")
 
     def clean_username(self):
-        username = self.cleaned_data.get("username")
-        if not self.creating_profile:
-            return username
-        User = get_user_model()
-        lookup = {f"{User.USERNAME_FIELD}__iexact": username}
-        if User.objects.filter(**lookup).exists():
-            raise ValidationError("This username is already in use. Choose another one.")
+        username = self.cleaned_data["username"].strip()
+        if self.creating_profile:
+            User = get_user_model()
+            lookup = {f"{User.USERNAME_FIELD}__iexact": username}
+            if User.objects.filter(**lookup).exists():
+                raise ValidationError("This username is already in use. Choose another one.")
         return username
 
     def clean(self):
@@ -126,7 +151,10 @@ class TeacherForm(StyledModelForm):
                 self.add_error("password2", "The passwords do not match.")
             if password1:
                 User = get_user_model()
-                user = User(**{User.USERNAME_FIELD: cleaned_data.get("username", "")})
+                user = User(**{
+                    User.USERNAME_FIELD: cleaned_data.get("username", ""),
+                    "email": cleaned_data.get("email", ""),
+                })
                 try:
                     validate_password(password1, user=user)
                 except ValidationError as error:
@@ -139,21 +167,28 @@ class TeacherForm(StyledModelForm):
             return teacher
         if not self.creating_profile:
             teacher.save()
-            self.save_m2m()
             return teacher
 
         User = get_user_model()
-        username = self.cleaned_data["username"]
-        credentials = {User.USERNAME_FIELD: username, "password": self.cleaned_data["password1"]}
+        user_fields = {
+            User.USERNAME_FIELD: self.cleaned_data["username"],
+            "password": self.cleaned_data["password1"],
+        }
         if any(field.name == "email" for field in User._meta.get_fields()):
-            credentials["email"] = self.cleaned_data["email"]
+            user_fields["email"] = self.cleaned_data["email"]
+
         with transaction.atomic():
-            user = User.objects.create_user(**credentials)
+            # Recheck uniqueness inside the transaction to handle simultaneous submissions.
+            lookup = {f"{User.USERNAME_FIELD}__iexact": self.cleaned_data["username"]}
+            if User.objects.filter(**lookup).exists():
+                self.add_error("username", "This username is already in use. Choose another one.")
+                raise ValidationError("Could not create the teacher account because the username is already in use.")
+            user = User.objects.create_user(**user_fields)
             user.is_staff = False
             user.is_superuser = False
             user.save(update_fields=["is_staff", "is_superuser"])
-            group, _ = Group.objects.get_or_create(name="Teacher")
-            user.groups.add(group)
+            teacher_group, _ = Group.objects.get_or_create(name="Teacher")
+            user.groups.add(teacher_group)
             teacher.user = user
             teacher.save()
         return teacher
@@ -163,7 +198,11 @@ class CourseForm(StyledModelForm):
     class Meta:
         model = Course
         fields = ["course_name", "teacher", "start_date", "end_date", "description"]
-        widgets = {"start_date": forms.DateInput(attrs={"type": "date"}), "end_date": forms.DateInput(attrs={"type": "date"}), "description": forms.Textarea(attrs={"rows": 4})}
+        widgets = {
+            "start_date": forms.DateInput(attrs={"type": "date"}),
+            "end_date": forms.DateInput(attrs={"type": "date"}),
+            "description": forms.Textarea(attrs={"rows": 4}),
+        }
 
     def clean(self):
         cleaned_data = super().clean()
@@ -202,7 +241,10 @@ class AttendanceForm(StyledModelForm):
         if teacher is not None:
             teacher_courses = Course.objects.filter(teacher__user=teacher)
             self.fields["course"].queryset = teacher_courses
-            self.fields["student"].queryset = Student.objects.filter(enrollments__course__in=teacher_courses, enrollments__status=Enrollment.STATUS_APPROVED).distinct()
+            self.fields["student"].queryset = Student.objects.filter(
+                enrollments__course__in=teacher_courses,
+                enrollments__status=Enrollment.STATUS_APPROVED,
+            ).distinct()
 
     def clean(self):
         cleaned_data = super().clean()

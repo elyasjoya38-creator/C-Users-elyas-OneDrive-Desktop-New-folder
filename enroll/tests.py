@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.test import TestCase
 
 from .forms import TeacherForm
@@ -42,9 +41,18 @@ class TeacherAccountCreationTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("username", form.errors)
 
-    def test_edit_form_does_not_expose_credentials(self):
-        teacher = Teacher.objects.create(full_name="Amina Teacher", specialization="Math", email="amina@example.com", phone="0700000000")
+    def test_edit_form_preserves_linked_account_without_credential_fields(self):
+        User = get_user_model()
+        user = User.objects.create_user(username="amina_teacher", password="TeacherPass!7392")
+        teacher = Teacher.objects.create(
+            full_name="Amina Teacher",
+            specialization="Mathematics",
+            email="amina@example.com",
+            phone="0700000000",
+            user=user,
+        )
         form = TeacherForm(instance=teacher)
         self.assertNotIn("username", form.fields)
         self.assertNotIn("password1", form.fields)
         self.assertNotIn("password2", form.fields)
+        self.assertEqual(form.save().user, user)
