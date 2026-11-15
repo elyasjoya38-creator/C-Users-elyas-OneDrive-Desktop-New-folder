@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.test import TestCase
+from django.urls import reverse
 
 from .forms import TeacherForm
 from .models import Teacher
@@ -56,3 +58,35 @@ class TeacherAccountCreationTests(TestCase):
         self.assertNotIn("password1", form.fields)
         self.assertNotIn("password2", form.fields)
         self.assertEqual(form.save().user, user)
+
+    def test_admin_can_create_teacher_and_teacher_can_sign_in(self):
+        User = get_user_model()
+        admin = User.objects.create_user(username="pdc_admin", password="AdminPass!7392", is_staff=True)
+        self.client.force_login(admin)
+        response = self.client.post(reverse("add_teacher"), {
+            "full_name": "Amina Teacher",
+            "specialization": "Mathematics",
+            "email": "amina@example.com",
+            "phone": "0700000000",
+            "username": "amina_teacher",
+            "password1": "TeacherPass!7392",
+            "password2": "TeacherPass!7392",
+        })
+        self.assertRedirects(response, reverse("teacher_list"))
+        teacher = Teacher.objects.get(email="amina@example.com")
+        self.assertEqual(teacher.user.username, "amina_teacher")
+        self.assertTrue(teacher.user.groups.filter(name="Teacher").exists())
+        self.client.logout()
+        self.assertTrue(self.client.login(username="amina_teacher", password="TeacherPass!7392"))
+        self.assertEqual(self.client.get(reverse("user_dashboard")).status_code, 200)
+
+    def test_student_cannot_open_teacher_creation_page(self):
+        User = get_user_model()
+        student_user = User.objects.create_user(username="student_user", password="StudentPass!7392")
+        student_group, _ = Group.objects.get_or_create(name="Student")
+        student_user.groups.add(student_group)
+        self.client.force_login(student_user)
+        response = self.client.get(reverse("add_teacher"))
+        self.assertNotEqual(response.status_code, 200)
+
+
