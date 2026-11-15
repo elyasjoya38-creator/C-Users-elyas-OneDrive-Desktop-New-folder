@@ -82,7 +82,7 @@ class Student(models.Model):
     )
 
     class Meta:
-        ordering = ["full_name", "id"]
+        ordering = ["id"]
 
     def __str__(self):
         return self.full_name
@@ -105,9 +105,33 @@ class Enrollment(models.Model):
 
     class Meta:
         ordering = ["-enrolled_at", "id"]
+        constraints = [models.UniqueConstraint(fields=["student", "course"], name="unique_student_course_enrollment")]
 
     def __str__(self):
         return f"{self.student} - {self.course} ({self.get_status_display()})"
+
+
+class PDCRegistration(models.Model):
+    STATUS_PENDING = "pending"
+    STATUS_APPROVED = "approved"
+    STATUS_REJECTED = "rejected"
+    STATUS_CHOICES = (
+        (STATUS_PENDING, "Pending review"),
+        (STATUS_APPROVED, "Registered"),
+        (STATUS_REJECTED, "Rejected"),
+    )
+
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="pdc_registrations")
+    pdc = models.ForeignKey(pdc_detials, on_delete=models.CASCADE, related_name="registrations")
+    requested_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=STATUS_PENDING)
+
+    class Meta:
+        ordering = ["-requested_at", "id"]
+        constraints = [models.UniqueConstraint(fields=["student", "pdc"], name="unique_student_pdc_registration")]
+
+    def __str__(self):
+        return f"{self.student} - {self.pdc} ({self.get_status_display()})"
 
 
 ATTENDANCE_STATUS = (

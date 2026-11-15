@@ -1,0 +1,19 @@
+{% extends 'enroll/index.html' %}
+{% load static %}
+{% block contents %}
+<link rel="stylesheet" href="{% static 'enroll/css/forms.css' %}">
+<section class="record-form-page">
+    <header class="record-form-heading"><div><p class="record-form-kicker">Ghargistan University · PDC</p><h1>درخواست‌های ثبت‌نام PDC</h1><p>تعداد درخواست‌ها و اشتراک‌کننده‌ها را ببینید و درخواست‌ها را بررسی کنید.</p></div><span class="record-form-icon">📊</span></header>
+    <div class="directory-card">
+        {% if messages %}{% for message in messages %}<div class="form-message {{ message.tags }}" role="status">{{ message }}</div>{% endfor %}{% endif %}
+        <p class="directory-count">مجموع: {{ registrations|length }} درخواست</p>
+        <div class="directory-table-wrap"><table class="directory-table">
+            <thead><tr><th>برنامه</th><th>شاگرد</th><th>شماره شاگردی</th><th>تاریخ درخواست</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+            <tbody>{% for item in registrations %}<tr>
+                <td>{{ item.pdc.title }}</td><td>{{ item.student.full_name }}</td><td>{{ item.student.student_id }}</td><td>{{ item.requested_at|date:"Y-m-d H:i" }}</td><td>{{ item.get_status_display }}</td>
+                <td>{% if item.status == 'pending' %}<div class="directory-actions"><form method="post" action="{% url 'review_pdc_registration' item.id %}">{% csrf_token %}<input type="hidden" name="status" value="approved"><button class="table-action" type="submit">تأیید</button></form><form method="post" action="{% url 'review_pdc_registration' item.id %}">{% csrf_token %}<input type="hidden" name="status" value="rejected"><button class="table-action table-action-danger" type="submit">رد</button></form></div>{% else %}—{% endif %}</td>
+            </tr>{% empty %}<tr><td class="directory-empty" colspan="6">هنوز درخواست اشتراک ثبت نشده است.</td></tr>{% endfor %}</tbody>
+        </table></div>
+    </div>
+</section>
+{% endblock contents %}
