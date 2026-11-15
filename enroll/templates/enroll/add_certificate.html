@@ -1,23 +1,8 @@
 {% extends 'enroll/index.html' %}
-
+{% load static %}
+{% block title %}Issue certificate | PDC Portal{% endblock %}
 {% block contents %}
-
-<div class="panel">
-
-    <h2>📄 Create Certificate</h2>
-
-    <form method="POST">
-
-        {% csrf_token %}
-
-        {{ form.as_p }}
-
-        <button class="primary" type="submit">
-            Save Certificate
-        </button>
-
-    </form>
-
-</div>
-
-{% endblock %}
+<link rel="stylesheet" href="{% static 'enroll/css/forms.css' %}">
+{% url 'certificate_list' as cancel_url %}
+{% include 'enroll/_record_form.html' with page_title='Issue certificate' page_description='Create a certificate record for a student who completed a course.' page_icon='▧' submit_label='Issue certificate' cancel_url=cancel_url %}
+{% endblock contents %}

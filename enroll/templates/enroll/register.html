@@ -1,14 +1,7 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ثبت حساب شاگرد | سیستم PDC</title>
-<style>
-*{box-sizing:border-box}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#1565c0,#0d2e68);font-family:Tahoma,Arial,sans-serif;color:#1e293b}.card{width:min(100%,560px);padding:30px;border-radius:18px;background:white;box-shadow:0 20px 55px #061b3c44}.logo{text-align:center}.logo img{width:78px;height:78px;object-fit:contain}h1{text-align:center;color:#0d47a1;font-size:25px;margin:12px 0}.lead{text-align:center;color:#64748b;line-height:1.8;margin:0 0 20px}.field{margin-bottom:15px}.field label{display:block;margin-bottom:7px;font-weight:bold}.field input{width:100%;min-height:45px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font:inherit}.field input:focus{outline:0;border-color:#1565c0;box-shadow:0 0 0 3px #1565c022}.help,.error{font-size:12px;line-height:1.7;color:#64748b}.error{color:#b91c1c}.alert{padding:11px 13px;margin-bottom:12px;border-radius:8px;background:#fef2f2;color:#991b1b}.submit{width:100%;min-height:46px;border:0;border-radius:8px;background:#1565c0;color:white;font:inherit;font-weight:bold;cursor:pointer}.bottom{text-align:center;margin-top:18px;color:#64748b}.bottom a{color:#1565c0;font-weight:bold;text-decoration:none}
-</style></head>
-<body><main class="card"><div class="logo"><img src="{% static 'enroll/images/LOGO-GHU.png' %}" alt="لوگوی دانشگاه غرجستان"></div><h1>ساخت حساب شاگرد</h1><p class="lead">ادارهٔ PDC باید نخست پروفایل شاگرد را ثبت کرده باشد. شمارهٔ شاگردی خود را برای ساخت حساب وارد کنید؛ ثبت‌نام آنلاین خودکار دسترسی مدیر نمی‌دهد.</p>
-{% if messages %}{% for message in messages %}<div class="alert {{ message.tags }}" role="status">{{ message }}</div>{% endfor %}{% endif %}
-<form method="post">{% csrf_token %}{% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
-{% for field in form %}<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<div class="help">{{ field.help_text|safe }}</div>{% endif %}{% for error in field.errors %}<div class="error">{{ error }}</div>{% endfor %}</div>{% endfor %}
-<button class="submit" type="submit">ساخت حساب</button></form><div class="bottom">حساب داری؟ <a href="{% url 'login' %}">ورود</a></div></main></body></html>
+<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ساخت حساب شاگرد | PDC</title><link rel="stylesheet" href="{% static 'enroll/css/portal.css' %}"></head>
+<body class="auth-page"><main class="auth-card"><div class="auth-brand"><img src="{% static 'enroll/images/LOGO-GHU.png' %}" alt="لوگوی دانشگاه غرجستان"><h1>ساخت حساب شاگرد</h1><p>پروفایل شاگرد باید قبلاً توسط ادارهٔ PDC ثبت شده باشد.</p></div>
+{% if messages %}{% for message in messages %}<div class="portal-message {{ message.tags }}" role="status">{{ message }}</div>{% endfor %}{% endif %}
+<form method="post">{% csrf_token %}{% if form.non_field_errors %}<div class="auth-error">{{ form.non_field_errors }}</div>{% endif %}
+{% for field in form %}<div class="auth-field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<div class="auth-help">{{ field.help_text|safe }}</div>{% endif %}{% for error in field.errors %}<div class="auth-error">{{ error }}</div>{% endfor %}</div>{% endfor %}
+<button class="portal-btn auth-submit" type="submit">ساخت حساب</button></form><div class="auth-links">حساب داری؟ <a href="{% url 'login' %}">ورود</a></div></main></body></html>

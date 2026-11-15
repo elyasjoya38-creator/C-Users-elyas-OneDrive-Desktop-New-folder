@@ -1,7 +1,8 @@
 {% extends 'enroll/index.html' %}
 {% load static %}
+{% block title %}PDC event form | PDC Portal{% endblock %}
 {% block contents %}
 <link rel="stylesheet" href="{% static 'enroll/css/forms.css' %}">
 {% url 'managepdc' as cancel_url %}
-{% include 'enroll/_record_form.html' with page_title='Add PDC' page_description='Create a professional development event or program.' page_icon='🎓' submit_label='Save PDC' cancel_url=cancel_url %}
+{% include 'enroll/_record_form.html' with page_title='Create a PDC event' page_description='Add a professional development event. It will appear in the student portal for registration.' page_icon='✦' submit_label='Publish event' cancel_url=cancel_url %}
 {% endblock contents %}
