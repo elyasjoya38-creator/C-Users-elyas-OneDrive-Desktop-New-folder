@@ -1,135 +1,14 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create User Account | PDC</title>
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            min-height: 100vh;
-            margin: 0;
-            display: grid;
-            place-items: center;
-            padding: 22px;
-            background: linear-gradient(135deg, #1565c0, #0d2e68);
-            font-family: Arial, sans-serif;
-        }
-        .card {
-            width: min(100%, 520px);
-            padding: 30px 28px 24px;
-            border: 1px solid rgba(255,255,255,.2);
-            border-radius: 20px;
-            background: #fff;
-            box-shadow: 0 20px 55px rgba(6, 27, 60, .28);
-        }
-        .logo { display: flex; justify-content: center; margin-bottom: 12px; }
-        .logo img { width: 80px; height: 80px; object-fit: contain; }
-        h1 {
-            margin: 0 0 8px;
-            color: #0d47a1;
-            font-size: 28px;
-            text-align: center;
-        }
-        .lead {
-            margin: 0 0 18px;
-            color: #475569;
-            font-size: 14px;
-            line-height: 1.6;
-            text-align: center;
-        }
-        .field { margin-bottom: 16px; }
-        .field label {
-            display: block;
-            margin-bottom: 7px;
-            color: #334155;
-            font-size: 14px;
-            font-weight: 700;
-        }
-        .field input,
-        .field select {
-            width: 100%;
-            min-height: 46px;
-            padding: 11px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 9px;
-            background: #fff;
-            color: #1e293b;
-            font-size: 15px;
-        }
-        .field input:focus,
-        .field select:focus {
-            border-color: #1565c0;
-            box-shadow: 0 0 0 3px rgba(21,101,192,.12);
-            outline: none;
-        }
-        .helptext,
-        .errorlist,
-        .message {
-            margin: 6px 0 0;
-            color: #64748b;
-            font-size: 12px;
-            line-height: 1.6;
-        }
-        .errorlist { color: #b91c1c; }
-        .message {
-            margin-bottom: 12px;
-            padding: 11px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-        }
-        .message.success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
-        .message.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
-        button {
-            width: 100%;
-            min-height: 46px;
-            margin-top: 10px;
-            border: 0;
-            border-radius: 9px;
-            background: linear-gradient(135deg, #1565c0, #42a5f5);
-            color: #fff;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .bottom {
-            margin-top: 18px;
-            color: #64748b;
-            font-size: 14px;
-            text-align: center;
-        }
-        .bottom a { color: #1565c0; font-weight: 700; text-decoration: none; }
-    </style>
-</head>
-<body>
-    <main class="card">
-        <div class="logo">
-            <img src="{% static 'enroll/images/LOGO-GHU.png' %}" alt="Ghargistan University logo">
-        </div>
-        <h1>Create User Account</h1>
-        <p class="lead">Register as a PDC participant. New accounts receive standard user access.</p>
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="message {{ message.tags }}" role="status">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="post">
-            {% csrf_token %}
-            {% for field in form %}
-                <div class="field">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.help_text %}<div class="helptext">{{ field.help_text|safe }}</div>{% endif %}
-                    {% for error in field.errors %}<p class="errorlist">{{ error }}</p>{% endfor %}
-                </div>
-            {% endfor %}
-            <button type="submit">Create account</button>
-        </form>
-
-        <div class="bottom">Already registered? <a href="{% url 'login' %}">Sign in</a></div>
-    </main>
-</body>
-</html>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ثبت حساب شاگرد | سیستم PDC</title>
+<style>
+*{box-sizing:border-box}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#1565c0,#0d2e68);font-family:Tahoma,Arial,sans-serif;color:#1e293b}.card{width:min(100%,560px);padding:30px;border-radius:18px;background:white;box-shadow:0 20px 55px #061b3c44}.logo{text-align:center}.logo img{width:78px;height:78px;object-fit:contain}h1{text-align:center;color:#0d47a1;font-size:25px;margin:12px 0}.lead{text-align:center;color:#64748b;line-height:1.8;margin:0 0 20px}.field{margin-bottom:15px}.field label{display:block;margin-bottom:7px;font-weight:bold}.field input{width:100%;min-height:45px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font:inherit}.field input:focus{outline:0;border-color:#1565c0;box-shadow:0 0 0 3px #1565c022}.help,.error{font-size:12px;line-height:1.7;color:#64748b}.error{color:#b91c1c}.alert{padding:11px 13px;margin-bottom:12px;border-radius:8px;background:#fef2f2;color:#991b1b}.submit{width:100%;min-height:46px;border:0;border-radius:8px;background:#1565c0;color:white;font:inherit;font-weight:bold;cursor:pointer}.bottom{text-align:center;margin-top:18px;color:#64748b}.bottom a{color:#1565c0;font-weight:bold;text-decoration:none}
+</style></head>
+<body><main class="card"><div class="logo"><img src="{% static 'enroll/images/LOGO-GHU.png' %}" alt="لوگوی دانشگاه غرجستان"></div><h1>ساخت حساب شاگرد</h1><p class="lead">ادارهٔ PDC باید نخست پروفایل شاگرد را ثبت کرده باشد. شمارهٔ شاگردی خود را برای ساخت حساب وارد کنید؛ ثبت‌نام آنلاین خودکار دسترسی مدیر نمی‌دهد.</p>
+{% if messages %}{% for message in messages %}<div class="alert {{ message.tags }}" role="status">{{ message }}</div>{% endfor %}{% endif %}
+<form method="post">{% csrf_token %}{% if form.non_field_errors %}<div class="error">{{ form.non_field_errors }}</div>{% endif %}
+{% for field in form %}<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<div class="help">{{ field.help_text|safe }}</div>{% endif %}{% for error in field.errors %}<div class="error">{{ error }}</div>{% endfor %}</div>{% endfor %}
+<button class="submit" type="submit">ساخت حساب</button></form><div class="bottom">حساب داری؟ <a href="{% url 'login' %}">ورود</a></div></main></body></html>

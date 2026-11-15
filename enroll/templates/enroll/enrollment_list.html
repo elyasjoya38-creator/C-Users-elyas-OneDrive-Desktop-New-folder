@@ -1,54 +1,26 @@
 {% extends 'enroll/index.html' %}
-
+{% load static %}
 {% block contents %}
-
-<div class="panel">
-
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-
-        <h2>📝 Enrollment Management</h2>
-
-        <a class="primary"
-           href="{% url 'add_enrollment' %}">
-            ➕ Add Enrollment
-        </a>
-
+<link rel="stylesheet" href="{% static 'enroll/css/forms.css' %}">
+<section class="record-form-page">
+    <header class="record-form-heading"><div><p class="record-form-kicker">Ghargistan University · PDC</p><h1>Student enrollment requests</h1><p>Review self-service requests from student accounts.</p></div><span class="record-form-icon" aria-hidden="true">📝</span></header>
+    <div class="directory-card">
+        {% if messages %}{% for message in messages %}<div class="form-message {{ message.tags }}" role="status">{{ message }}</div>{% endfor %}{% endif %}
+        <div class="directory-table-wrap"><table class="directory-table">
+            <thead><tr><th>Student</th><th>Course</th><th>Requested</th><th>Status</th><th>Review</th></tr></thead>
+            <tbody>
+                {% for enrollment in enrollments %}<tr>
+                    <td>{{ enrollment.student.full_name }} <small>({{ enrollment.student.student_id }})</small></td>
+                    <td>{{ enrollment.course.course_name }}</td><td>{{ enrollment.enrolled_at }}</td>
+                    <td>{{ enrollment.get_status_display }}</td>
+                    <td>{% if enrollment.status == 'pending' %}<div class="directory-actions">
+                        <form method="post" action="{% url 'review_enrollment' enrollment.id %}">{% csrf_token %}<input type="hidden" name="status" value="approved"><button class="table-action" type="submit">Approve</button></form>
+                        <form method="post" action="{% url 'review_enrollment' enrollment.id %}">{% csrf_token %}<input type="hidden" name="status" value="rejected"><button class="table-action table-action-danger" type="submit">Reject</button></form>
+                    </div>{% else %}—{% endif %}</td>
+                </tr>{% empty %}<tr><td class="directory-empty" colspan="5">No enrollment requests yet.</td></tr>{% endfor %}
+            </tbody>
+        </table></div>
+        <p class="directory-count">{{ enrollments|length }} enrollment record{{ enrollments|length|pluralize }}</p>
     </div>
-
-    <table>
-
-        <thead>
-            <tr>
-                <th>Student</th>
-                <th>Course</th>
-                <th>Enrollment Date</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-            {% for enrollment in enrollments %}
-
-            <tr>
-                <td>{{ enrollment.student }}</td>
-                <td>{{ enrollment.course }}</td>
-                <td>{{ enrollment.enrolled_at }}</td>
-            </tr>
-
-            {% empty %}
-
-            <tr>
-                <td colspan="3">
-                    No enrollments found.
-                </td>
-            </tr>
-
-            {% endfor %}
-
-        </tbody>
-
-    </table>
-
-</div>
-
-{% endblock %}
+</section>
+{% endblock contents %}

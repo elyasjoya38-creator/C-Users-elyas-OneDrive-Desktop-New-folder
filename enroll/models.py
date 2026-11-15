@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -5,11 +6,9 @@ PDC_TYPES = (
     ("Seminar", "Seminar"),
     ("Workshop", "Workshop"),
     ("Course", "Course"),
-    # Keep stored values unchanged to avoid disrupting existing records.
     ("Tranning", "Training"),
     ("zoomcall", "Zoom Call"),
 )
-# Backwards-compatible name used by older project code.
 typelist = PDC_TYPES
 
 
@@ -38,6 +37,13 @@ class Teacher(models.Model):
     specialization = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=20)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="teacher_profile",
+    )
 
     class Meta:
         ordering = ["full_name", "id"]
@@ -67,6 +73,13 @@ class Student(models.Model):
     department = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=20)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="student_profile",
+    )
 
     class Meta:
         ordering = ["full_name", "id"]
@@ -76,15 +89,25 @@ class Student(models.Model):
 
 
 class Enrollment(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    STATUS_PENDING = "pending"
+    STATUS_APPROVED = "approved"
+    STATUS_REJECTED = "rejected"
+    STATUS_CHOICES = (
+        (STATUS_PENDING, "Pending review"),
+        (STATUS_APPROVED, "Approved"),
+        (STATUS_REJECTED, "Rejected"),
+    )
+
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="enrollments")
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="enrollments")
     enrolled_at = models.DateField(auto_now_add=True)
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=STATUS_APPROVED)
 
     class Meta:
         ordering = ["-enrolled_at", "id"]
 
     def __str__(self):
-        return f"{self.student} - {self.course}"
+        return f"{self.student} - {self.course} ({self.get_status_display()})"
 
 
 ATTENDANCE_STATUS = (
