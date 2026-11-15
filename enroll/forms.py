@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import Group
+from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
@@ -39,8 +41,6 @@ class StudentRegistrationForm(UserCreationForm):
         user.is_staff = False
         user.is_superuser = False
         if commit:
-            from django.contrib.auth.models import Group
-
             with transaction.atomic():
                 user.save()
                 student = Student.objects.select_for_update().get(student_id=self.cleaned_data["student_id"], user__isnull=True)
@@ -55,13 +55,7 @@ class AddPDCForm(StyledModelForm):
     class Meta:
         model = pdc_detials
         fields = ["title", "producer", "descript", "types", "time", "startdate", "enddate", "location", "urls"]
-        widgets = {
-            "descript": forms.Textarea(attrs={"rows": 4}),
-            "time": forms.TimeInput(attrs={"type": "time"}),
-            "startdate": forms.DateInput(attrs={"type": "date"}),
-            "enddate": forms.DateInput(attrs={"type": "date"}),
-            "urls": forms.URLInput(attrs={"placeholder": "https://example.com"}),
-        }
+        widgets = {"descript": forms.Textarea(attrs={"rows": 4}), "time": forms.TimeInput(attrs={"type": "time"}), "startdate": forms.DateInput(attrs={"type": "date"}), "enddate": forms.DateInput(attrs={"type": "date"}), "urls": forms.URLInput(attrs={"placeholder": "https://example.com"})}
 
     def clean(self):
         cleaned_data = super().clean()
@@ -83,25 +77,85 @@ class StudentForm(StyledModelForm):
 
 
 class TeacherForm(StyledModelForm):
+    """Staff creates the teacher's login while creating their profile.
+
+    Editing an existing profile intentionally does not expose account credentials.
+    """
+
+    username = forms.CharField(label="Teacher login username", max_length=150)
+    password1 = forms.CharField(label="Temporary password", strip=False, widget=forms.PasswordInput)
+    password2 = forms.CharField(label="Confirm temporary password", strip=False, widget=forms.PasswordInput)
+
     class Meta:
         model = Teacher
-        fields = ["full_name", "specialization", "email", "phone", "user"]
-        labels = {"full_name": "Full name", "email": "Email address", "phone": "Phone number", "user": "Teacher login account (optional)"}
+        fields = ["full_name", "specialization", "email", "phone"]
+        labels = {"full_name": "Full name", "email": "Email address", "phone": "Phone number"}
         widgets = {"email": forms.EmailInput(attrs={"autocomplete": "email"}), "phone": forms.TextInput(attrs={"autocomplete": "tel", "inputmode": "tel"})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.creating_profile = self.instance.pk is None
+        if self.creating_profile:
+            User = get_user_model()
+            self.fields["username"].max_length = User._meta.get_field(User.USERNAME_FIELD).max_length
+            self.fields["username"].widget.attrs["autocomplete"] = "username"
+            self.fields["password1"].widget.attrs["autocomplete"] = "new-password"
+            self.fields["password2"].widget.attrs["autocomplete"] = "new-password"
+            self.fields["password1"].help_text = "Give this temporary password to the teacher securely; they should change it after signing in."
+        else:
+            self.fields.pop("username")
+            self.fields.pop("password1")
+            self.fields.pop("password2")
+
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+        if not self.creating_profile:
+            return username
         User = get_user_model()
-        self.fields["user"].queryset = User.objects.filter(is_staff=False, is_superuser=False).exclude(groups__name="Student").order_by("username").distinct()
-        self.fields["user"].required = False
-        self.fields["user"].help_text = "Select a non-staff teacher account, or leave blank."
+        lookup = {f"{User.USERNAME_FIELD}__iexact": username}
+        if User.objects.filter(**lookup).exists():
+            raise ValidationError("This username is already in use. Choose another one.")
+        return username
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.creating_profile:
+            password1 = cleaned_data.get("password1")
+            password2 = cleaned_data.get("password2")
+            if password1 and password2 and password1 != password2:
+                self.add_error("password2", "The passwords do not match.")
+            if password1:
+                User = get_user_model()
+                user = User(**{User.USERNAME_FIELD: cleaned_data.get("username", "")})
+                try:
+                    validate_password(password1, user=user)
+                except ValidationError as error:
+                    self.add_error("password1", error)
+        return cleaned_data
 
     def save(self, commit=True):
-        from django.contrib.auth.models import Group
-        teacher = super().save(commit=commit)
-        if commit and teacher.user_id:
-            teacher_group, _ = Group.objects.get_or_create(name="Teacher")
-            teacher.user.groups.add(teacher_group)
+        teacher = super().save(commit=False)
+        if not commit:
+            return teacher
+        if not self.creating_profile:
+            teacher.save()
+            self.save_m2m()
+            return teacher
+
+        User = get_user_model()
+        username = self.cleaned_data["username"]
+        credentials = {User.USERNAME_FIELD: username, "password": self.cleaned_data["password1"]}
+        if any(field.name == "email" for field in User._meta.get_fields()):
+            credentials["email"] = self.cleaned_data["email"]
+        with transaction.atomic():
+            user = User.objects.create_user(**credentials)
+            user.is_staff = False
+            user.is_superuser = False
+            user.save(update_fields=["is_staff", "is_superuser"])
+            group, _ = Group.objects.get_or_create(name="Teacher")
+            user.groups.add(group)
+            teacher.user = user
+            teacher.save()
         return teacher
 
 

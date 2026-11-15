@@ -1,6 +1,8 @@
 {% extends 'enroll/index.html' %}
-
+{% load static %}
+{% block title %}ثبت استاد | پورتال PDC{% endblock %}
 {% block contents %}
+<link rel="stylesheet" href="{% static 'enroll/css/forms.css' %}">
 {% url 'teacher_list' as cancel_url %}
-{% include 'enroll/_record_form.html' with page_title='Register Teacher' page_description='Enter the teacher’s professional and contact details.' page_icon='👩‍🏫' submit_label='Save Teacher' cancel_url=cancel_url %}
+{% include 'enroll/_record_form.html' with page_title='ثبت استاد و ایجاد حساب ورود' page_description='با ثبت این فورم، پروفایل استاد و حساب ورود با نقش Teacher هم‌زمان ساخته می‌شود. حساب Staff یا مدیر نمی‌باشد.' page_icon='👩‍🏫' submit_label='ثبت استاد و حساب' cancel_url=cancel_url %}
 {% endblock contents %}
